@@ -123,15 +123,15 @@ public class UserController {
         }
     }
 
-//    @PutMapping("/attendance/{attendanceId}")
-//    public ResponseEntity<Object> updateAttendance(@PathVariable Long attendanceId, @RequestBody UserAttendanceRequest request) {
-//        try {
-//            Attendance updatedAttendance = userService.updateAttendance(attendanceId, request);
-//            return new ResponseEntity<>(updatedAttendance, HttpStatus.OK);
-//        } catch (EntityNotFoundException e) {
-//            return new ResponseEntity<>("해당 출퇴근 기록을 찾을 수 없습니다.", HttpStatus.NOT_FOUND);
-//        }
-//    }
+    @PutMapping("/attendance/{attendanceId}")
+    public ResponseEntity<Object> updateAttendance(@PathVariable Long attendanceId, @RequestBody UserAttendanceRequest request) {
+        try {
+            Attendance updatedAttendance = userService.updateAttendance(attendanceId, request);
+            return new ResponseEntity<>(updatedAttendance, HttpStatus.OK);
+        } catch (EntityNotFoundException e) {
+            return new ResponseEntity<>("해당 출퇴근 기록을 찾을 수 없습니다.", HttpStatus.NOT_FOUND);
+        }
+    }
 //    @PutMapping("/attendance")
 //    public ResponseEntity<Object> updateAttendance(@RequestBody AttendancePairDto request) {
 //        try {
@@ -143,17 +143,17 @@ public class UserController {
 //            return new ResponseEntity<>("요청이 유효하지 않습니다. ", HttpStatus.BAD_REQUEST);
 //        }
 //    }
-    @PutMapping("/attendance")
-    public ResponseEntity<Object> updateAttendance(@RequestBody AttendanceUpdateDto request) {
-        try {
-            AttendanceUpdateDto updatedAttendance = userService.updateAttendance(request);
-            return new ResponseEntity<>(updatedAttendance, HttpStatus.OK);
-        } catch (EntityNotFoundException e) {
-            return new ResponseEntity<>("해당 출퇴근 기록을 찾을 수 없습니다.", HttpStatus.NOT_FOUND);
-        } catch(IllegalArgumentException e) {
-            return new ResponseEntity<>("요청이 유효하지 않습니다. ", HttpStatus.BAD_REQUEST);
-        }
-    }
+//    @PutMapping("/attendance")
+//    public ResponseEntity<Object> updateAttendance(@RequestBody AttendanceUpdateDto request) {
+//        try {
+//            AttendanceUpdateDto updatedAttendance = userService.updateAttendance(request);
+//            return new ResponseEntity<>(updatedAttendance, HttpStatus.OK);
+//        } catch (EntityNotFoundException e) {
+//            return new ResponseEntity<>("해당 출퇴근 기록을 찾을 수 없습니다.", HttpStatus.NOT_FOUND);
+//        } catch(IllegalArgumentException e) {
+//            return new ResponseEntity<>("요청이 유효하지 않습니다. ", HttpStatus.BAD_REQUEST);
+//        }
+//    }
     @DeleteMapping("/attendance/{attendanceId}")
     public ResponseEntity<Object> deleteAttendance(@PathVariable Long attendanceId) {
         try {

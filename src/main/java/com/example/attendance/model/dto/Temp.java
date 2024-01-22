@@ -16,5 +16,4 @@ public class Temp {
     private LocalDate attendanceDate;
 
     private String status;
-
 }

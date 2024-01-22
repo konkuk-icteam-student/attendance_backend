@@ -3,6 +3,7 @@ package com.example.attendance.model.repository;
 import com.example.attendance.model.dto.AttendanceGetResponse;
 import com.example.attendance.model.entity.Attendance;
 import com.example.attendance.model.entity.SiteUser;
+import com.example.attendance.model.entity.StudentWorkSemester;
 import jakarta.transaction.Transactional;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
@@ -19,5 +20,7 @@ public interface UserAttendanceRepository extends JpaRepository<Attendance,Long>
     List<Attendance> findAllWithSiteUser();
 
     List<Attendance> findBySiteUserAndAttendanceDateBetween(SiteUser user, LocalDate startDate, LocalDate endDate);
+
+//    List<Attendance> findBySiteUserId(Long userId);
 //    ListfindBySiteUser_Id();
 }

@@ -263,46 +263,29 @@ public Attendance attendanceCreate(UserAttendanceRequest request) {
             List<StudentWorkSemester> studentWorkSemesters = studentWorkSemesterRepository.findBySiteUserId(userId);
             studentWorkSemesterRepository.deleteAll(studentWorkSemesters);
 
+//            List<Attendance> atttendances = UserAttendanceRepository.findBySiteUserId(userId);
+
             userRepository.delete(user);
         } else {
             throw new EntityNotFoundException("해당 사용자를 찾을 수 없습니다.");
         }
     }
 
-    public AttendanceUpdateDto updateAttendance(AttendanceUpdateDto request) {
-        if(request.getArriveAttendance() != null && request.getLeaveAttendance() != null)
-        {
-            Optional<Attendance> optionalArriveAttendance = userAttendanceRepository.findById(request.getArriveAttendance().getId());
-            Optional<Attendance> optionalLeaveAttendance = userAttendanceRepository.findById(request.getLeaveAttendance().getId());
+    public Attendance updateAttendance(Long attendanceId, UserAttendanceRequest request) {
+        Optional<Attendance> optionalAttendance = userAttendanceRepository.findById(attendanceId);
 
-            if (optionalArriveAttendance.isPresent() && optionalLeaveAttendance.isPresent()) {
-                Attendance arriveAttendance = optionalArriveAttendance.get();
-                Attendance leaveAttendance = optionalLeaveAttendance.get();
+        if (optionalAttendance.isPresent()) {
+            Attendance attendance = optionalAttendance.get();
 
-                // Update fields based on request
-                arriveAttendance.setAttendanceTime(request.getArriveAttendance().getAttendanceTime());
-                arriveAttendance.setAttendanceDate(request.getArriveAttendance().getAttendanceDate());
-                arriveAttendance.setStatus(request.getArriveAttendance().getStatus());
+            // Update fields based on request
+            attendance.setAttendanceTime(request.getAttendanceTime());
+            attendance.setAttendanceDate(request.getAttendanceDate());
+            attendance.setStatus(request.getStatus());
 
-                leaveAttendance.setAttendanceTime(request.getLeaveAttendance().getAttendanceTime());
-                leaveAttendance.setAttendanceDate(request.getLeaveAttendance().getAttendanceDate());
-                leaveAttendance.setStatus(request.getLeaveAttendance().getStatus());
-
-                //AttendancePairDto updatedAttendance = new AttendancePairDto(userAttendanceRepository.save(arriveAttendance), userAttendanceRepository.save(leaveAttendance));
-                // Save the updated attendance
-
-                AttendanceUpdateDto updatedAttendance = new AttendanceUpdateDto();
-                
-                userAttendanceRepository.save(arriveAttendance);
-                userAttendanceRepository.save(leaveAttendance);
-
-                return updatedAttendance;
-            }
-            else{
-                throw new EntityNotFoundException("해당 출퇴근 기록을 찾을 수 없습니다.");
-            }
+            // Save the updated attendance
+            return userAttendanceRepository.save(attendance);
         } else {
-            throw new IllegalArgumentException("요청이 유효하지 않습니다.");
+            throw new EntityNotFoundException("해당 출퇴근 기록을 찾을 수 없습니다.");
         }
     }
 
