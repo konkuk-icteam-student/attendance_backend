@@ -8,8 +8,8 @@ spring:
     driver-class-name: com.mysql.cj.jdbc.Driver
     url: "jdbc:mysql://localhost/attendance_db"
     username: root
-#    password: 1234
-    password: flask130*
+    password: 1234
+
 
   thymeleaf:
     cache: false
