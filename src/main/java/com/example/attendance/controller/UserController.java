@@ -195,8 +195,9 @@ public class UserController {
     @GetMapping("/attendance/monthly/{userId}")
     public ResponseEntity<Object> getUserMonthlyAttendance(@PathVariable String userId, @RequestParam int year, @RequestParam int month) {
         try {
-            List<AttendancePairDto> monthlyAttendancePairs = userService.getUserMonthlyAttendancePairs(userId, year, month);
-            return new ResponseEntity<>(monthlyAttendancePairs, HttpStatus.OK);
+//            List<AttendancePairDto> monthlyAttendancePairs = userService.getUserMonthlyAttendancePairs(userId, year, month);
+            AttendanceMonthResponseDto monthlyAttendanceData = userService.getUserMonthlyAttendancePairs(userId, year, month);
+            return new ResponseEntity<>(monthlyAttendanceData, HttpStatus.OK);
         } catch (EntityNotFoundException e) {
             return new ResponseEntity<>("해당 사용자를 찾을 수 없습니다.", HttpStatus.NOT_FOUND);
         }

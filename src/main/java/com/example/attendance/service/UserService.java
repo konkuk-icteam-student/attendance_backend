@@ -18,6 +18,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
 
+import java.time.Duration;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
@@ -336,7 +337,7 @@ public String attendanceCreate(UserAttendanceRequest request) {
 //
 //        return userAttendanceRepository.findBySiteUserAndAttendanceDateBetween(optionalUser.get(), startDate, endDate);
 //    }
-public List<AttendancePairDto> getUserMonthlyAttendancePairs(String userId, int year, int month) {
+public AttendanceMonthResponseDto getUserMonthlyAttendancePairs(String userId, int year, int month) {
     SiteUser user = userRepository.findByUserId(userId);
 
     if (user == null) {
@@ -352,8 +353,10 @@ public List<AttendancePairDto> getUserMonthlyAttendancePairs(String userId, int 
     return pairAttendances(monthlyAttendance);
 }
 
-    public List<AttendancePairDto> pairAttendances(List<Attendance> attendances) {
+    public AttendanceMonthResponseDto pairAttendances(List<Attendance> attendances) {
         List<AttendancePairDto> resultPairs = new ArrayList<>();
+
+        Duration totalDuration = Duration.ZERO;
 
         // 1과 0을 각각 모아놓을 맵
         Map<LocalDate, List<Attendance>> arriveMap = new HashMap<>();
@@ -399,7 +402,10 @@ public List<AttendancePairDto> getUserMonthlyAttendancePairs(String userId, int 
 
                     AttendancePairDto pair = new AttendancePairDto(arriveAttendance, leaveAttendance);
                     resultPairs.add(pair);
-
+                    if(pair.getWorkDuration() != null)
+                    {
+                        totalDuration = totalDuration.plus(pair.getWorkDuration());
+                    }
                 }
             }
         }
@@ -434,12 +440,20 @@ public List<AttendancePairDto> getUserMonthlyAttendancePairs(String userId, int 
 
                     AttendancePairDto pair = new AttendancePairDto(arriveAttendance, leaveAttendance);
                     resultPairs.add(pair);
-                    //pair.getWorkDuration();
+                    if(pair.getWorkDuration() != null)
+                    {
+                        totalDuration = totalDuration.plus(pair.getWorkDuration());
+                    }
                 }
             }
         }
 
-        return resultPairs;
+        AttendanceMonthResponseDto attendanceMonthData = new AttendanceMonthResponseDto();
+        attendanceMonthData.setAttendanceDataList(resultPairs);
+        attendanceMonthData.setTotalDuration(totalDuration);
+        System.out.println(totalDuration);
+//        return resultPairs;
+        return attendanceMonthData;
     }
 
 //
@@ -464,15 +478,21 @@ public List<AttendancePairDto> getUserMonthlyAttendancePairs(String userId, int 
         Dept department = deptRepository.findById(deptId)
                 .orElseThrow(() -> new EntityNotFoundException("해당 부서를 찾을 수 없습니다."));
 
-        // 부서에 속한 유저 중, 오늘 출0 기록이 홀수인 유저들을 조회
+        // 부서에 속한 유저 중, 현재 출근중인 유저들을 조회
         List<SiteUser> allUsersInDepartment = userRepository.findByDept(department);
-        List<UserInfo> currentAttendanceUsers = allUsersInDepartment.stream()
-                .filter(user -> {
-                    int dayAttendanceSum = userAttendanceRepository.findBySiteUserAndAttendanceDate(user, LocalDate.now()).size();
-                    return dayAttendanceSum % 2 != 0; // 홀수인 경우 필터링
-                })
-                .map(this::convertToUserInfo) // SiteUser를 UserInfo로 변환
-                .collect(Collectors.toList());
+
+        List<UserInfo> currentAttendanceUsers = new ArrayList<>();
+        for (SiteUser user : allUsersInDepartment) {
+            List<Attendance> dayAttendances = userAttendanceRepository.findBySiteUserAndAttendanceDate(user, LocalDate.now());
+            dayAttendances.sort(Comparator.comparing(Attendance::getAttendanceTime).reversed()); // 시간 역순으로 정렬
+
+            if (!dayAttendances.isEmpty()) {
+                Attendance latestAttendance = dayAttendances.get(0);
+                if ("1".equals(latestAttendance.getStatus())) { // 가장 최근 출근 기록의 status가 1이면 현재 출근중
+                    currentAttendanceUsers.add(convertToUserInfo(user));
+                }
+            }
+        }
 
         return currentAttendanceUsers;
     }
