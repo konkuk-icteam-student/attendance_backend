@@ -23,7 +23,7 @@ public class UserSemesterService {
 
     private final UserSemesterRepository userSemesterRepository;
 
-    public StudentWorkSemester create(UserSetSemesterRequest request){
+    public String create(UserSetSemesterRequest request){
         WorkSemester workSemester;
         SiteUser user;
         if(!workSemesterRepository.existsByYearAndSemester(request.getYear(),request.getSemester()))
@@ -37,7 +37,9 @@ public class UserSemesterService {
         StudentWorkSemester studentWorkSemester = new StudentWorkSemester();
         studentWorkSemester.setWorkSemester(workSemester);
         studentWorkSemester.setSiteUser(user);
-        return userSemesterRepository.save(studentWorkSemester);
+        userSemesterRepository.save(studentWorkSemester);
+
+        return "학기 설정 완료";
     }
 
 

@@ -29,6 +29,6 @@ public class WorkSemester {
     private LocalDateTime createTime;
 
     @OneToMany(mappedBy = "workSemester")
-    @JsonManagedReference
+    //@JsonManagedReference
     private List<StudentWorkSemester> studentWorkSemesterList;
 }

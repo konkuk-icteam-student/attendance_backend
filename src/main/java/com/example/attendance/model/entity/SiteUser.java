@@ -40,7 +40,7 @@ public class SiteUser {
     private List<TimeTable> timeTables;
 
     @OneToMany(mappedBy = "siteUser")
-    @JsonManagedReference
+    //@JsonManagedReference
     private  List<StudentWorkSemester> studentWorkSemesterList;
 
 }

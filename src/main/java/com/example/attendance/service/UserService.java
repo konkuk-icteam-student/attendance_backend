@@ -49,7 +49,7 @@ public class UserService {
         this.studentWorkSemesterRepository = studentWorkSemesterRepository;
     }
 
-    public SiteUser create(UserCreateRequest request){
+    public UserInfo create(UserCreateRequest request){
         if (userRepository.existsByUserId(request.getUser_id())) {
             throw new DuplicateUserIdException("User with userId " + request.getUser_id() + " already exists");
         }
@@ -65,7 +65,16 @@ public class UserService {
         //부서이름으로 부서데이터 찾아서 부서 id를 user에 저장하기
         Dept dept = this.deptService.getDeptByName(request.getDept());
         user.setDept(dept);
-        return this.userRepository.save(user);
+
+        SiteUser newUser = this.userRepository.save(user);
+
+        //Dto 변환
+        UserInfo newUserDto = new UserInfo();
+        newUserDto.setUserName(user.getUserName());
+        newUserDto.setUserId(user.getUserId());
+        newUserDto.setId(user.getId());
+        newUserDto.setUserPhoneNum(user.getUserPhoneNum());
+        return newUserDto;
     }
 
 //    public String attendanceCreate(UserAttendanceRequest request){
@@ -81,7 +90,7 @@ public class UserService {
 //        attendance.setCreateTime(null);
 //
 //        //새로 추가
-//        attendance.setStatus((day_attendance_sum %2 == 0 ) ? "출근" : "퇴근");
+//        attendance.setStatus((day_attendance_sum %2 == 0 ) ? "1" : "0");
 //
 //        this.userAttendanceRepository.save(attendance);
 //
@@ -90,7 +99,7 @@ public class UserService {
 //        String webhookUrl = "/api/webhook/2573721c/vlWBbePJ6k7kZ9rJMAvYapQe"; //팀룸 동현쌤
 //
 //        // 웹훅에 전달할 데이터 생성
-//        String message = user.getUserName() + "님이 " + ((day_attendance_sum %2 == 0 ) ? "출근" : "퇴근") + "하였습니다.";
+//        String message = user.getUserName() + "님이 " + ((day_attendance_sum %2 == 0 ) ? "1" : "0") + "하였습니다.";
 //        String payload = "{\"text\": \"" + message + "\"}";
 //
 //        // WebClient를 사용하여 POST 요청 전송
@@ -101,7 +110,7 @@ public class UserService {
 //                .bodyToMono(String.class)
 //                .block();  // 간단하게 처리하기 위해 blocking 사용, 비동기 처리를 위해 subscribe() 사용
 //
-//        return (day_attendance_sum %2 == 0 ) ? "출근" : "퇴근";
+//        return (day_attendance_sum %2 == 0 ) ? "1" : "0";
 //    }
 //    public String attendanceCreate(UserAttendanceRequest request) {
 //        SiteUser user = this.userRepository.findByUserId(request.getUserId());
@@ -120,7 +129,7 @@ public class UserService {
 //        attendance.setCreateTime(null);
 //
 //        // 새로 추가
-//        attendance.setStatus((day_attendance_sum % 2 == 0) ? "출근" : "퇴근");
+//        attendance.setStatus((day_attendance_sum % 2 == 0) ? "1" : "0");
 //
 //        this.userAttendanceRepository.save(attendance);
 //
@@ -129,7 +138,7 @@ public class UserService {
 //        String webhookUrl = "/api/webhook/2573721c/vlWBbePJ6k7kZ9rJMAvYapQe"; // 팀룸 동현쌤
 //
 //        // 웹훅에 전달할 데이터 생성
-//        String message = user.getUserName() + "님이 " + ((day_attendance_sum % 2 == 0) ? "출근" : "퇴근") + "하였습니다.";
+//        String message = user.getUserName() + "님이 " + ((day_attendance_sum % 2 == 0) ? "1" : "0") + "하였습니다.";
 //        String payload = "{\"text\": \"" + message + "\"}";
 //
 //        // WebClient를 사용하여 POST 요청 전송
@@ -140,9 +149,9 @@ public class UserService {
 //                .bodyToMono(String.class)
 //                .block();  // 간단하게 처리하기 위해 blocking 사용, 비동기 처리를 위해 subscribe() 사용
 //
-//        return (day_attendance_sum % 2 == 0) ? "출근" : "퇴근";
+//        return (day_attendance_sum % 2 == 0) ? "1" : "0";
 //    }
-public Attendance attendanceCreate(UserAttendanceRequest request) {
+public String attendanceCreate(UserAttendanceRequest request) {
     SiteUser user = this.userRepository.findByUserId(request.getUserId());
 
     if (user == null) {
@@ -160,7 +169,7 @@ public Attendance attendanceCreate(UserAttendanceRequest request) {
     attendance.setStatus(request.getStatus());
 
     // 새로 추가
-    //attendance.setStatus((day_attendance_sum % 2 == 0) ? "출근" : "퇴근");
+    //attendance.setStatus((day_attendance_sum % 2 == 0) ? "1" : "0");
 
     this.userAttendanceRepository.save(attendance);
 
@@ -180,10 +189,10 @@ public Attendance attendanceCreate(UserAttendanceRequest request) {
             .bodyToMono(String.class)
             .block();  // 간단하게 처리하기 위해 blocking 사용, 비동기 처리를 위해 subscribe() 사용
 
-    return attendance;
+    return "출퇴근 저장 성공";
 }
 
-    public Attendance requiredAttendanceCreate(UserAttendanceRequest request){
+    public String requiredAttendanceCreate(UserAttendanceRequest request){
         SiteUser user = this.userRepository.findByUserId(request.getUserId());
 
         Attendance attendance = new Attendance();
@@ -196,7 +205,7 @@ public Attendance attendanceCreate(UserAttendanceRequest request) {
 
         this.userAttendanceRepository.save(attendance);
 
-        return attendance;
+        return "출퇴근 저장 성공";
     }
 
     @Autowired
@@ -285,7 +294,7 @@ public Attendance attendanceCreate(UserAttendanceRequest request) {
             // Save the updated attendance
             return userAttendanceRepository.save(attendance);
         } else {
-            throw new EntityNotFoundException("해당 출퇴근 기록을 찾을 수 없습니다.");
+            throw new EntityNotFoundException("해당 출0 기록을 찾을 수 없습니다.");
         }
     }
 
@@ -298,7 +307,7 @@ public Attendance attendanceCreate(UserAttendanceRequest request) {
             // Delete the attendance record
             userAttendanceRepository.delete(attendance);
         } else {
-            throw new EntityNotFoundException("해당 출퇴근 기록을 찾을 수 없습니다.");
+            throw new EntityNotFoundException("해당 출0 기록을 찾을 수 없습니다.");
         }
     }
 
@@ -339,34 +348,34 @@ public List<AttendancePairDto> getUserMonthlyAttendancePairs(String userId, int 
 
     List<Attendance> monthlyAttendance = userAttendanceRepository.findBySiteUserAndAttendanceDateBetween(user, startDate, endDate);
 
-    // 출근과 퇴근을 시간순으로 정렬하여 묶어주는 메서드 호출
+    // 1과 0을 시간순으로 정렬하여 묶어주는 메서드 호출(출근:1, 퇴근:0)
     return pairAttendances(monthlyAttendance);
 }
 
     public List<AttendancePairDto> pairAttendances(List<Attendance> attendances) {
         List<AttendancePairDto> resultPairs = new ArrayList<>();
-        System.out.println("--------------------------1------------------------");
-        // 출근과 퇴근을 각각 모아놓을 맵
+
+        // 1과 0을 각각 모아놓을 맵
         Map<LocalDate, List<Attendance>> arriveMap = new HashMap<>();
         Map<LocalDate, List<Attendance>> leaveMap = new HashMap<>();
 
-        // 출근과 퇴근을 나누어 맵에 추가
+        // 1과 0을 나누어 맵에 추가
         for (Attendance attendance : attendances) {
-            if ("출근".equals(attendance.getStatus())) {
+            if ("1".equals(attendance.getStatus())) {
                 arriveMap.computeIfAbsent(attendance.getAttendanceDate(), key -> new ArrayList<>()).add(attendance);
-            } else if ("퇴근".equals(attendance.getStatus())) {
+            } else if ("0".equals(attendance.getStatus())) {
                 leaveMap.computeIfAbsent(attendance.getAttendanceDate(), key -> new ArrayList<>()).add(attendance);
             }
         }
 
         if(arriveMap.size() >= leaveMap.size())
         {
-            // 출근과 퇴근을 쌍으로 묶음
+            // 1과 0을 쌍으로 묶음
             for (Map.Entry<LocalDate, List<Attendance>> arriveEntry : arriveMap.entrySet()) {
                 LocalDate date = arriveEntry.getKey();
                 List<Attendance> arriveList = arriveEntry.getValue();
                 List<Attendance> leaveList = leaveMap.getOrDefault(date, new ArrayList<>());
-                System.out.println("--------------------------5------------------------");
+
                 // 시간순으로 정렬
                 arriveList.sort(Comparator.comparing(Attendance::getAttendanceTime));
                 leaveList.sort(Comparator.comparing(Attendance::getAttendanceTime));
@@ -378,10 +387,10 @@ public List<AttendancePairDto> getUserMonthlyAttendancePairs(String userId, int 
 
                     if (leaveAttendance != null && (arriveAttendance == null || leaveAttendance.getAttendanceTime().isBefore(arriveAttendance.getAttendanceTime()))) {
                         arriveAttendance = null;
-                        j++; // 다음 퇴근 데이터로 이동
+                        j++; // 다음 0 데이터로 이동
                     } else if (arriveAttendance != null && (leaveAttendance == null || arriveAttendance.getAttendanceTime().isAfter(leaveAttendance.getAttendanceTime()))) {
                         leaveAttendance = null;
-                        i++; // 다음 출근 데이터로 이동
+                        i++; // 다음 1 데이터로 이동
                     } else {
                         // 쌍을 이룰 수 있는 경우
                         i++;
@@ -396,12 +405,12 @@ public List<AttendancePairDto> getUserMonthlyAttendancePairs(String userId, int 
         }
         else
         {
-            // 출근과 퇴근을 쌍으로 묶음
+            // 1과 0을 쌍으로 묶음
             for (Map.Entry<LocalDate, List<Attendance>> leaveEntry : leaveMap.entrySet()) {
                 LocalDate date = leaveEntry.getKey();
                 List<Attendance> arriveList = arriveMap.getOrDefault(date, new ArrayList<>());
                 List<Attendance> leaveList = leaveEntry.getValue();
-                System.out.println("--------------------------5------------------------");
+
                 // 시간순으로 정렬
                 arriveList.sort(Comparator.comparing(Attendance::getAttendanceTime));
                 leaveList.sort(Comparator.comparing(Attendance::getAttendanceTime));
@@ -413,10 +422,10 @@ public List<AttendancePairDto> getUserMonthlyAttendancePairs(String userId, int 
 
                     if (leaveAttendance != null && (arriveAttendance == null || leaveAttendance.getAttendanceTime().isBefore(arriveAttendance.getAttendanceTime()))) {
                         arriveAttendance = null;
-                        j++; // 다음 퇴근 데이터로 이동
+                        j++; // 다음 0 데이터로 이동
                     } else if (arriveAttendance != null && (leaveAttendance == null || arriveAttendance.getAttendanceTime().isAfter(leaveAttendance.getAttendanceTime()))) {
                         leaveAttendance = null;
-                        i++; // 다음 출근 데이터로 이동
+                        i++; // 다음 1 데이터로 이동
                     } else {
                         // 쌍을 이룰 수 있는 경우
                         i++;
@@ -425,10 +434,10 @@ public List<AttendancePairDto> getUserMonthlyAttendancePairs(String userId, int 
 
                     AttendancePairDto pair = new AttendancePairDto(arriveAttendance, leaveAttendance);
                     resultPairs.add(pair);
+                    //pair.getWorkDuration();
                 }
             }
         }
-
 
         return resultPairs;
     }
@@ -455,7 +464,7 @@ public List<AttendancePairDto> getUserMonthlyAttendancePairs(String userId, int 
         Dept department = deptRepository.findById(deptId)
                 .orElseThrow(() -> new EntityNotFoundException("해당 부서를 찾을 수 없습니다."));
 
-        // 부서에 속한 유저 중, 오늘 출퇴근 기록이 홀수인 유저들을 조회
+        // 부서에 속한 유저 중, 오늘 출0 기록이 홀수인 유저들을 조회
         List<SiteUser> allUsersInDepartment = userRepository.findByDept(department);
         List<UserInfo> currentAttendanceUsers = allUsersInDepartment.stream()
                 .filter(user -> {

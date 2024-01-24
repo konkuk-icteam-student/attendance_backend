@@ -15,10 +15,10 @@ public class StudentWorkSemester {
     @GeneratedValue(strategy = GenerationType.IDENTITY)//mysql의 auto increment
     private Long id;
     @ManyToOne
-    @JsonBackReference
+    //@JsonBackReference
     private SiteUser siteUser;
 
     @ManyToOne
-    @JsonBackReference
+    //@JsonBackReference
     private WorkSemester workSemester;
 }

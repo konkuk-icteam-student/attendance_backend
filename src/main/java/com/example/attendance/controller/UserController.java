@@ -13,6 +13,7 @@ import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.apache.catalina.User;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -34,7 +35,7 @@ public class UserController {
     @PostMapping("/new-user")
     public ResponseEntity<Object> saveUser(@RequestBody UserCreateRequest request){
         try{
-            SiteUser createdUser = this.userService.create(request);
+            UserInfo createdUser = this.userService.create(request);
             return new ResponseEntity<>(createdUser, HttpStatus.CREATED);
         } catch (DuplicateUserIdException e) {
             return new ResponseEntity<>("이미 존재하는 아이디입니다.", HttpStatus.CONFLICT);
@@ -46,8 +47,8 @@ public class UserController {
     @PostMapping("/semester")
     public ResponseEntity<Object> setSemester(@RequestBody UserSetSemesterRequest request){
         try{
-            StudentWorkSemester createdStudentSemester = this.userSemesterService.create(request);
-            return new ResponseEntity<>(createdStudentSemester,HttpStatus.CREATED);
+            String message = this.userSemesterService.create(request);
+            return new ResponseEntity<>(message,HttpStatus.CREATED);
         }catch(EntityNotFoundException e){
             return new ResponseEntity<>("해당 학기가 존재하지 않습니다.", HttpStatus.CONFLICT);
         }
@@ -60,8 +61,8 @@ public class UserController {
     @PostMapping("/attendance")
     public ResponseEntity<Object> saveAttendance(@RequestBody UserAttendanceRequest request) {
         try {
-            Attendance data = this.userService.attendanceCreate(request);
-            return new ResponseEntity<>(data, HttpStatus.CREATED);
+            String message = this.userService.attendanceCreate(request);
+            return new ResponseEntity<>(message, HttpStatus.CREATED);
         } catch (EntityNotFoundException e) {
             return new ResponseEntity<>("유저를 찾을 수 없습니다.", HttpStatus.NOT_FOUND);
         }
@@ -89,7 +90,6 @@ public class UserController {
 //            // 나머지 필드에 대한 출력
 //        }
         List<AttendanceGetResponse> dtoList = this.userService.attendanceGet();
-
         return new ResponseEntity<>(dtoList,HttpStatus.OK);
     }
 
@@ -129,7 +129,7 @@ public class UserController {
             Attendance updatedAttendance = userService.updateAttendance(attendanceId, request);
             return new ResponseEntity<>(updatedAttendance, HttpStatus.OK);
         } catch (EntityNotFoundException e) {
-            return new ResponseEntity<>("해당 출퇴근 기록을 찾을 수 없습니다.", HttpStatus.NOT_FOUND);
+            return new ResponseEntity<>("해당 출0 기록을 찾을 수 없습니다.", HttpStatus.NOT_FOUND);
         }
     }
 //    @PutMapping("/attendance")
@@ -138,7 +138,7 @@ public class UserController {
 //            AttendancePairDto updatedAttendance = userService.updateAttendance(request);
 //            return new ResponseEntity<>(updatedAttendance, HttpStatus.OK);
 //        } catch (EntityNotFoundException e) {
-//            return new ResponseEntity<>("해당 출퇴근 기록을 찾을 수 없습니다.", HttpStatus.NOT_FOUND);
+//            return new ResponseEntity<>("해당 출0 기록을 찾을 수 없습니다.", HttpStatus.NOT_FOUND);
 //        } catch(IllegalArgumentException e) {
 //            return new ResponseEntity<>("요청이 유효하지 않습니다. ", HttpStatus.BAD_REQUEST);
 //        }
@@ -149,7 +149,7 @@ public class UserController {
 //            AttendanceUpdateDto updatedAttendance = userService.updateAttendance(request);
 //            return new ResponseEntity<>(updatedAttendance, HttpStatus.OK);
 //        } catch (EntityNotFoundException e) {
-//            return new ResponseEntity<>("해당 출퇴근 기록을 찾을 수 없습니다.", HttpStatus.NOT_FOUND);
+//            return new ResponseEntity<>("해당 출0 기록을 찾을 수 없습니다.", HttpStatus.NOT_FOUND);
 //        } catch(IllegalArgumentException e) {
 //            return new ResponseEntity<>("요청이 유효하지 않습니다. ", HttpStatus.BAD_REQUEST);
 //        }
@@ -158,9 +158,9 @@ public class UserController {
     public ResponseEntity<Object> deleteAttendance(@PathVariable Long attendanceId) {
         try {
             userService.deleteAttendance(attendanceId);
-            return new ResponseEntity<>("출퇴근 기록이 성공적으로 삭제되었습니다.", HttpStatus.OK);
+            return new ResponseEntity<>("출0 기록이 성공적으로 삭제되었습니다.", HttpStatus.OK);
         } catch (EntityNotFoundException e) {
-            return new ResponseEntity<>("해당 출퇴근 기록을 찾을 수 없습니다.", HttpStatus.NOT_FOUND);
+            return new ResponseEntity<>("해당 출0 기록을 찾을 수 없습니다.", HttpStatus.NOT_FOUND);
         }
     }
 
