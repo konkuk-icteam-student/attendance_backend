@@ -30,7 +30,10 @@ private final String[] allowedUrls = {"/**"};	// sign-up, sign-in 추가
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         //http.cors();
-        http.csrf().disable()
+        http
+                .cors()
+                .and()
+                .csrf().disable()
                 .authorizeHttpRequests(requests ->
                         requests.requestMatchers(allowedUrls).permitAll()// requestMatchers의 인자로 전달된 url은 모두에게 허용
                                 .anyRequest().authenticated()

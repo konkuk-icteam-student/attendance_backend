@@ -56,7 +56,10 @@ public class DeptController {
             return new ResponseEntity<>(updatedDept, HttpStatus.OK);
         } catch (EntityNotFoundException e) {
             return new ResponseEntity<>("부서를 찾을 수 없습니다.", HttpStatus.NOT_FOUND);
+        } catch (EntityExistsException e){
+            return new ResponseEntity<>("이미 존재하는 부서입니다.", HttpStatus.CONFLICT);
         }
+
     }
 
     @DeleteMapping("/{deptId}")

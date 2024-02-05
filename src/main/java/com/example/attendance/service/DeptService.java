@@ -118,6 +118,10 @@ public class DeptService {
         Dept existingDept = deptRepository.findById(deptId)
                 .orElseThrow(() -> new EntityNotFoundException("부서를 찾을 수 없습니다."));
 
+        if(deptRepository.existsByDeptName(request.getDeptName())){
+            throw new EntityExistsException("이미 존재하는 부서 이름입니다.");
+        }
+
         existingDept.setDeptName(request.getDeptName());
         existingDept.setWorkerNum(request.getWorkerNum());
         existingDept.setCreateId(null);

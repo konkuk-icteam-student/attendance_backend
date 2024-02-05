@@ -123,13 +123,14 @@ public class UserController {
         }
     }
 
-    @PutMapping("/attendance/{attendanceId}")
+    @PatchMapping("/attendance/{attendanceId}")
     public ResponseEntity<Object> updateAttendance(@PathVariable Long attendanceId, @RequestBody UserAttendanceRequest request) {
         try {
-            Attendance updatedAttendance = userService.updateAttendance(attendanceId, request);
-            return new ResponseEntity<>(updatedAttendance, HttpStatus.OK);
+            System.out.println("------------1-----------");
+            userService.updateAttendance(attendanceId, request);
+            return new ResponseEntity<>("근로시간 수정 완료", HttpStatus.OK);
         } catch (EntityNotFoundException e) {
-            return new ResponseEntity<>("해당 출0 기록을 찾을 수 없습니다.", HttpStatus.NOT_FOUND);
+            return new ResponseEntity<>("해당 출퇴근 기록을 찾을 수 없습니다.", HttpStatus.NOT_FOUND);
         }
     }
 //    @PutMapping("/attendance")
