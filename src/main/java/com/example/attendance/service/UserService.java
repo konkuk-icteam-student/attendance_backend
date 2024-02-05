@@ -281,7 +281,7 @@ public String attendanceCreate(UserAttendanceRequest request) {
         }
     }
 
-    public Attendance updateAttendance(Long attendanceId, UserAttendanceRequest request) {
+    public String updateAttendance(Long attendanceId, UserAttendanceRequest request) {
         Optional<Attendance> optionalAttendance = userAttendanceRepository.findById(attendanceId);
 
         if (optionalAttendance.isPresent()) {
@@ -293,7 +293,8 @@ public String attendanceCreate(UserAttendanceRequest request) {
             attendance.setStatus(request.getStatus());
 
             // Save the updated attendance
-            return userAttendanceRepository.save(attendance);
+            userAttendanceRepository.save(attendance);
+            return "근로시간 수정 성공";
         } else {
             throw new EntityNotFoundException("해당 출0 기록을 찾을 수 없습니다.");
         }
