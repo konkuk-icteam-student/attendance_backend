@@ -1,5 +1,6 @@
 package com.example.attendance.service;
 
+import com.example.attendance.controller.UserController;
 import com.example.attendance.exception.DuplicateUserIdException;
 import com.example.attendance.model.dto.*;
 import com.example.attendance.model.entity.Attendance;
@@ -39,15 +40,18 @@ public class UserService {
 
     private final StudentWorkSemesterRepository studentWorkSemesterRepository;
 
+    private final WebSocketService webSocketService;
+
 
     @Autowired
-    public UserService(UserRepository userRepository,DeptRepository deptRepository, UserAttendanceRepository userAttendanceRepository, WebClient.Builder webClientBuilder, DeptService deptService, StudentWorkSemesterRepository studentWorkSemesterRepository) {
+    public UserService(UserRepository userRepository,DeptRepository deptRepository, UserAttendanceRepository userAttendanceRepository, WebClient.Builder webClientBuilder, DeptService deptService, StudentWorkSemesterRepository studentWorkSemesterRepository, WebSocketService webSocketService) {
         this.userRepository = userRepository;
         this.deptRepository = deptRepository;
         this.userAttendanceRepository = userAttendanceRepository;
         this.webClient = webClientBuilder.baseUrl("https://teamroom.nate.com").build();
         this.deptService = deptService;
         this.studentWorkSemesterRepository = studentWorkSemesterRepository;
+        this.webSocketService = webSocketService;
     }
 
     public UserInfo create(UserCreateRequest request){
@@ -189,6 +193,8 @@ public String attendanceCreate(UserAttendanceRequest request) {
             .retrieve()
             .bodyToMono(String.class)
             .block();  // 간단하게 처리하기 위해 blocking 사용, 비동기 처리를 위해 subscribe() 사용
+
+    webSocketService.sendCurrentAttendanceUsers(user.getDept().getId(),getCurrentAttendanceUsers.getDept().getId()));
 
     return "출퇴근 저장 성공";
 }

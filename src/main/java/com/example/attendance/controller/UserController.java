@@ -8,12 +8,14 @@ import com.example.attendance.model.entity.SiteUser;
 import com.example.attendance.model.entity.StudentWorkSemester;
 import com.example.attendance.service.UserSemesterService;
 import com.example.attendance.service.UserService;
+import com.example.attendance.service.WebSocketService;
 import jakarta.persistence.EntityExistsException;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.apache.catalina.User;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -32,6 +34,10 @@ public class UserController {
     public final UserService userService;
 
     public final UserSemesterService userSemesterService;
+
+    //@Autowired
+    private final WebSocketService webSocketService;
+
     @PostMapping("/new-user")
     public ResponseEntity<Object> saveUser(@RequestBody UserCreateRequest request){
         try{
@@ -220,6 +226,17 @@ public class UserController {
             return new ResponseEntity<>(currentAttendanceUsers, HttpStatus.OK);
         } catch (EntityNotFoundException e) {
             return new ResponseEntity<>("해당 부서를 찾을 수 없습니다.", HttpStatus.NOT_FOUND);
+        }
+    }
+
+    @GetMapping("/send-attendance")
+    public ResponseEntity<String> sendAttendance(@RequestParam Long deptId) {
+        try {
+            List<UserInfo> currentAttendanceUsers = userService.getCurrentAttendanceUsers(deptId);
+            webSocketService.sendCurrentAttendanceUsers(deptId, currentAttendanceUsers);
+            return ResponseEntity.ok("Attendance information sent for deptId: " + deptId);
+        } catch (EntityNotFoundException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Department not found");
         }
     }
 }
