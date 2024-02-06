@@ -194,7 +194,7 @@ public String attendanceCreate(UserAttendanceRequest request) {
             .bodyToMono(String.class)
             .block();  // 간단하게 처리하기 위해 blocking 사용, 비동기 처리를 위해 subscribe() 사용
 
-    webSocketService.sendCurrentAttendanceUsers(user.getDept().getId(),getCurrentAttendanceUsers.getDept().getId()));
+    //webSocketService.sendCurrentAttendanceUsers(user.getDept().getId(),getCurrentAttendanceUsers.getDept().getId()));
 
     return "출퇴근 저장 성공";
 }
