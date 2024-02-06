@@ -229,14 +229,14 @@ public class UserController {
         }
     }
 
-    @GetMapping("/send-attendance")
-    public ResponseEntity<String> sendAttendance(@RequestParam Long deptId) {
-        try {
-            List<UserInfo> currentAttendanceUsers = userService.getCurrentAttendanceUsers(deptId);
-            webSocketService.sendCurrentAttendanceUsers(deptId, currentAttendanceUsers);
-            return ResponseEntity.ok("Attendance information sent for deptId: " + deptId);
-        } catch (EntityNotFoundException e) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Department not found");
-        }
-    }
+//    @GetMapping("/send-attendance")
+//    public ResponseEntity<String> sendAttendance(@RequestParam Long deptId) {
+//        try {
+//            List<UserInfo> currentAttendanceUsers = userService.getCurrentAttendanceUsers(deptId);
+//            webSocketService.sendCurrentAttendanceUsers(deptId, currentAttendanceUsers);
+//            return ResponseEntity.ok("Attendance information sent for deptId: " + deptId);
+//        } catch (EntityNotFoundException e) {
+//            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Department not found");
+//        }
+//    }
 }
