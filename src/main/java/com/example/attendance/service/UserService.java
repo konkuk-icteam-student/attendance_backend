@@ -1,6 +1,7 @@
 package com.example.attendance.service;
 
 import com.example.attendance.controller.UserController;
+import com.example.attendance.controller.WebSocketController;
 import com.example.attendance.exception.DuplicateUserIdException;
 import com.example.attendance.model.dto.*;
 import com.example.attendance.model.entity.Attendance;
@@ -43,6 +44,7 @@ public class UserService {
     private final WebSocketService webSocketService;
 
 
+
     @Autowired
     public UserService(UserRepository userRepository,DeptRepository deptRepository, UserAttendanceRepository userAttendanceRepository, WebClient.Builder webClientBuilder, DeptService deptService, StudentWorkSemesterRepository studentWorkSemesterRepository, WebSocketService webSocketService) {
         this.userRepository = userRepository;
@@ -52,6 +54,7 @@ public class UserService {
         this.deptService = deptService;
         this.studentWorkSemesterRepository = studentWorkSemesterRepository;
         this.webSocketService = webSocketService;
+
     }
 
     public UserInfo create(UserCreateRequest request){
@@ -177,6 +180,9 @@ public String attendanceCreate(UserAttendanceRequest request) {
     //attendance.setStatus((day_attendance_sum % 2 == 0) ? "1" : "0");
 
     this.userAttendanceRepository.save(attendance);
+
+
+    this.webSocketService.sendCurrentAttendanceUsers(user.getDept().getId(),getCurrentAttendanceUsers(user.getDept().getId()));
 
     // 호출할 웹훅 URL
     // String webhookUrl = "/api/webhook/4e71dbbb/8KG8Vhn3dJ9zZG1Y0j9qX0hs"; // 팀룸 준형

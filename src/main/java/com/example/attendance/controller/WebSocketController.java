@@ -47,6 +47,7 @@ import org.springframework.messaging.handler.annotation.Payload;
 import org.springframework.messaging.handler.annotation.SendTo;
 import org.springframework.stereotype.Controller;
 import org.springframework.stereotype.Repository;
+import org.springframework.web.bind.annotation.PathVariable;
 
 import java.util.Collections;
 import java.util.List;
@@ -65,15 +66,46 @@ public class WebSocketController {
 //            return Collections.emptyList();
 //        }
 //    }
-    @MessageMapping("/dept")
-    @SendTo("/topic/currentMember/1")
-    public List<UserInfo> sendAttendance(@Payload DeptIdRequest deptIdRequest) {
-        try {
-            List<UserInfo> currentAttendanceUsers = userService.getCurrentAttendanceUsers(deptIdRequest.getDeptId());
-            return currentAttendanceUsers;
-        } catch (EntityNotFoundException e) {
-            return Collections.emptyList();
-        }
+//    @MessageMapping("/dept/{deptId}")
+//    @SendTo("/topic/currentMember/{deptId}")
+//    public List<UserInfo> sendAttendance(@Payload DeptIdRequest deptIdRequest) {
+//        try {
+//            List<UserInfo> currentAttendanceUsers = userService.getCurrentAttendanceUsers(deptIdRequest.getDeptId());
+//            System.out.println(deptIdRequest.getDeptId());
+//            System.out.println("--------send code----------");
+//            return currentAttendanceUsers;
+//        } catch (EntityNotFoundException e) {
+//            System.out.println("--------is error----------");
+//            return Collections.emptyList();
+//        }
+//    }
+@MessageMapping("/dept/{deptId}")
+@SendTo("/topic/currentMember/{deptId}")
+public List<UserInfo> sendAttendance(@DestinationVariable Long deptId) {
+    try {
+
+        List<UserInfo> currentAttendanceUsers = userService.getCurrentAttendanceUsers(deptId);
+        System.out.println(deptId);
+        System.out.println("--------send code----------");
+        return currentAttendanceUsers;
+    } catch (EntityNotFoundException e) {
+        System.out.println("--------is error----------");
+        return Collections.emptyList();
+    }
 }
+
+    //@MessageMapping("/dept/{deptId}")
+//    @SendTo("/topic/currentMember/1")
+//    public List<UserInfo> sendAttendance2(Long deptId2) {
+//        try {
+//            List<UserInfo> currentAttendanceUsers = userService.getCurrentAttendanceUsers(deptId2);
+//            System.out.println(deptId2);
+//            System.out.println("--------send code----------");
+//            return currentAttendanceUsers;
+//        } catch (EntityNotFoundException e) {
+//            System.out.println("--------is error----------");
+//            return Collections.emptyList();
+//        }
+//    }
 }
 

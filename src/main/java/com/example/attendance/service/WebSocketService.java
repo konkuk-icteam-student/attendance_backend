@@ -18,7 +18,7 @@ public class WebSocketService {
 //    private UserService userService;
 
     public void sendCurrentAttendanceUsers(Long deptId, List<UserInfo> currentAttendanceUsers) {
-        String destination = "/topic/attendance/dept/" + deptId;
+        String destination = "/topic/currentMember/" + deptId;
         messagingTemplate.convertAndSend(destination, currentAttendanceUsers);
     }
 }

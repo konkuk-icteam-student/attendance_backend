@@ -35,8 +35,6 @@ public class UserController {
 
     public final UserSemesterService userSemesterService;
 
-    //@Autowired
-    private final WebSocketService webSocketService;
 
     @PostMapping("/new-user")
     public ResponseEntity<Object> saveUser(@RequestBody UserCreateRequest request){
