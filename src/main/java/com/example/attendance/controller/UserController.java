@@ -65,7 +65,10 @@ public class UserController {
     @PostMapping("/attendance")
     public ResponseEntity<Object> saveAttendance(@RequestBody UserAttendanceRequest request) {
         try {
+            long startTime = System.currentTimeMillis();
             String message = this.userService.attendanceCreate(request);
+            long stopTime = System.currentTimeMillis();
+            System.out.println("attendance duration total time :"+(stopTime - startTime));
             return new ResponseEntity<>(message, HttpStatus.CREATED);
         } catch (EntityNotFoundException e) {
             return new ResponseEntity<>("유저를 찾을 수 없습니다.", HttpStatus.NOT_FOUND);

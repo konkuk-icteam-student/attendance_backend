@@ -27,3 +27,5 @@ spring:
         format_sql: 'true'
         use_sql_comments: 'true'
         default_batch_fetch_size: 100
+jwt:
+  secret: b552278a2c6f3a748a31f41b34ec5348ed6fa1b62ab77c28e7e64d1ae6adfc73

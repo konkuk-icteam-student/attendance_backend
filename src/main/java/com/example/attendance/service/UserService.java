@@ -34,7 +34,7 @@ public class UserService {
     private final UserRepository userRepository;
     private final DeptRepository deptRepository;
 
-    private final WebClient webClient;//webhook
+    //private final WebClient webClient;//webhook
     @Autowired
     private final UserAttendanceRepository userAttendanceRepository;
     private final DeptService deptService;
@@ -43,17 +43,20 @@ public class UserService {
 
     private final WebSocketService webSocketService;
 
+    private final WebHookService webHookService;
+
 
 
     @Autowired
-    public UserService(UserRepository userRepository,DeptRepository deptRepository, UserAttendanceRepository userAttendanceRepository, WebClient.Builder webClientBuilder, DeptService deptService, StudentWorkSemesterRepository studentWorkSemesterRepository, WebSocketService webSocketService) {
+    public UserService(UserRepository userRepository,DeptRepository deptRepository, UserAttendanceRepository userAttendanceRepository, WebClient.Builder webClientBuilder, DeptService deptService, StudentWorkSemesterRepository studentWorkSemesterRepository, WebSocketService webSocketService, WebHookService webHookService) {
         this.userRepository = userRepository;
         this.deptRepository = deptRepository;
         this.userAttendanceRepository = userAttendanceRepository;
-        this.webClient = webClientBuilder.baseUrl("https://teamroom.nate.com").build();
+        //this.webClient = webClientBuilder.baseUrl("https://teamroom.nate.com").build();
         this.deptService = deptService;
         this.studentWorkSemesterRepository = studentWorkSemesterRepository;
         this.webSocketService = webSocketService;
+        this.webHookService = webHookService;
 
     }
 
@@ -160,6 +163,7 @@ public class UserService {
 //        return (day_attendance_sum % 2 == 0) ? "1" : "0";
 //    }
 public String attendanceCreate(UserAttendanceRequest request) {
+    long startTime1 = System.currentTimeMillis();
     SiteUser user = this.userRepository.findByUserId(request.getUserId());
 
     if (user == null) {
@@ -183,25 +187,36 @@ public String attendanceCreate(UserAttendanceRequest request) {
 
 
     this.webSocketService.sendCurrentAttendanceUsers(user.getDept().getId(),getCurrentAttendanceUsers(user.getDept().getId()));
+    long stopTime1 = System.currentTimeMillis();
+    System.out.println("attendance duration time :"+(stopTime1 - startTime1));
 
-    // 호출할 웹훅 URL
-    // String webhookUrl = "/api/webhook/4e71dbbb/8KG8Vhn3dJ9zZG1Y0j9qX0hs"; // 팀룸 준형
-    String webhookUrl = "/api/webhook/2573721c/vlWBbePJ6k7kZ9rJMAvYapQe"; // 팀룸 동현쌤
 
-    // 웹훅에 전달할 데이터 생성
-    String message = user.getUserName() + "님이 " + request.getStatus() + "하였습니다.";
-    String payload = "{\"text\": \"" + message + "\"}";
-
-    // WebClient를 사용하여 POST 요청 전송
-    webClient.post()
-            .uri(uriBuilder -> uriBuilder.path(webhookUrl).build())
-            .bodyValue(payload)
-            .retrieve()
-            .bodyToMono(String.class)
-            .block();  // 간단하게 처리하기 위해 blocking 사용, 비동기 처리를 위해 subscribe() 사용
-
-    //webSocketService.sendCurrentAttendanceUsers(user.getDept().getId(),getCurrentAttendanceUsers.getDept().getId()));
-
+    long startTime2 = System.currentTimeMillis();
+    this.webHookService.sendWebhookMessage(user.getUserName(),request.getStatus());
+    long stopTime2 = System.currentTimeMillis();
+    System.out.println("attendance duration of hook time :"+(stopTime2 - startTime2));
+//    System.out.println("attendance duration of hook time :"+(stopTime - startTime));
+//    long startTime = System.currentTimeMillis();
+//    // 호출할 웹훅 URL
+//    // String webhookUrl = "/api/webhook/4e71dbbb/8KG8Vhn3dJ9zZG1Y0j9qX0hs"; // 팀룸 준형
+//    String webhookUrl = "/api/webhook/2573721c/vlWBbePJ6k7kZ9rJMAvYapQe"; // 팀룸 동현쌤
+//
+//    // 웹훅에 전달할 데이터 생성
+//    String message = user.getUserName() + "님이 " + request.getStatus() + "하였습니다.";
+//    String payload = "{\"text\": \"" + message + "\"}";
+//
+//    // WebClient를 사용하여 POST 요청 전송
+//    webClient.post()
+//            .uri(uriBuilder -> uriBuilder.path(webhookUrl).build())
+//            .bodyValue(payload)
+//            .retrieve()
+//            .bodyToMono(String.class)
+//            .block();  // 간단하게 처리하기 위해 blocking 사용, 비동기 처리를 위해 subscribe() 사용
+//
+//    //webSocketService.sendCurrentAttendanceUsers(user.getDept().getId(),getCurrentAttendanceUsers.getDept().getId()));
+//
+//    long stopTime = System.currentTimeMillis();
+//    System.out.println("attendance duration of hook time :"+(stopTime - startTime));
     return "출퇴근 저장 성공";
 }
 
@@ -285,7 +300,8 @@ public String attendanceCreate(UserAttendanceRequest request) {
             List<StudentWorkSemester> studentWorkSemesters = studentWorkSemesterRepository.findBySiteUserId(userId);
             studentWorkSemesterRepository.deleteAll(studentWorkSemesters);
 
-//            List<Attendance> atttendances = UserAttendanceRepository.findBySiteUserId(userId);
+            List<Attendance> atttendancelog = userAttendanceRepository.findBySiteUserId(userId);
+            userAttendanceRepository.deleteAll(atttendancelog);
 
             userRepository.delete(user);
         } else {
@@ -462,6 +478,30 @@ public AttendanceMonthResponseDto getUserMonthlyAttendancePairs(String userId, i
         }
 
         AttendanceMonthResponseDto attendanceMonthData = new AttendanceMonthResponseDto();
+//        resultPairs.sort(Comparator
+//                .comparing((AttendancePairDto pair) -> pair.getArriveAttendance().getAttendanceDate())
+//                .thenComparing(pair -> pair.getArriveAttendance().getAttendanceTime()));
+
+        resultPairs.sort(Comparator
+                .comparing((AttendancePairDto pair) -> {
+                    Attendance arriveAttendance = pair.getArriveAttendance();
+                    if (arriveAttendance != null) {
+                        return arriveAttendance.getAttendanceDate();
+                    } else {
+                        // ArriveAttendance가 NULL인 경우 LeaveAttendance의 날짜를 반환
+                        return pair.getLeaveAttendance().getAttendanceDate();
+                    }
+                })
+                .thenComparing(pair -> {
+                    Attendance arriveAttendance = pair.getArriveAttendance();
+                    if (arriveAttendance != null) {
+                        return arriveAttendance.getAttendanceTime();
+                    } else {
+                        // ArriveAttendance가 NULL인 경우 LeaveAttendance의 시간을 반환
+                        return pair.getLeaveAttendance().getAttendanceTime();
+                    }
+                }));
+
         attendanceMonthData.setAttendanceDataList(resultPairs);
         attendanceMonthData.setTotalDuration(totalDuration);
         System.out.println(totalDuration);
