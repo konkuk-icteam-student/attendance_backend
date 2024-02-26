@@ -382,132 +382,233 @@ public AttendanceMonthResponseDto getUserMonthlyAttendancePairs(String userId, i
     return pairAttendances(monthlyAttendance);
 }
 
-    public AttendanceMonthResponseDto pairAttendances(List<Attendance> attendances) {
-        List<AttendancePairDto> resultPairs = new ArrayList<>();
+//    public AttendanceMonthResponseDto pairAttendances(List<Attendance> attendances) {
+//        List<AttendancePairDto> resultPairs = new ArrayList<>();
+//
+//        Duration totalDuration = Duration.ZERO;
+//
+//        // 1과 0을 각각 모아놓을 맵
+//        Map<LocalDate, List<Attendance>> arriveMap = new HashMap<>();
+//        Map<LocalDate, List<Attendance>> leaveMap = new HashMap<>();
+//
+//        // 1과 0을 나누어 맵에 추가
+//        for (Attendance attendance : attendances) {
+//            if ("1".equals(attendance.getStatus())) {
+//                arriveMap.computeIfAbsent(attendance.getAttendanceDate(), key -> new ArrayList<>()).add(attendance);
+//            } else if ("0".equals(attendance.getStatus())) {
+//                leaveMap.computeIfAbsent(attendance.getAttendanceDate(), key -> new ArrayList<>()).add(attendance);
+//            }
+//        }
+//
+//        if(arriveMap.size() >= leaveMap.size())
+//        {
+//            // 1과 0을 쌍으로 묶음
+//            for (Map.Entry<LocalDate, List<Attendance>> arriveEntry : arriveMap.entrySet()) {
+//                LocalDate date = arriveEntry.getKey();
+//                List<Attendance> arriveList = arriveEntry.getValue();
+//                List<Attendance> leaveList = leaveMap.getOrDefault(date, new ArrayList<>());
+//
+//                // 시간순으로 정렬
+//                arriveList.sort(Comparator.comparing(Attendance::getAttendanceTime));
+//                leaveList.sort(Comparator.comparing(Attendance::getAttendanceTime));
+//
+//                int i = 0, j = 0;
+//                while (i < arriveList.size() || j < leaveList.size()) {
+//                    Attendance arriveAttendance = (i < arriveList.size()) ? arriveList.get(i) : null;
+//                    Attendance leaveAttendance = (j < leaveList.size()) ? leaveList.get(j) : null;
+//
+//                    if (leaveAttendance != null && (arriveAttendance == null || leaveAttendance.getAttendanceTime().isBefore(arriveAttendance.getAttendanceTime()))) {
+//                        arriveAttendance = null;
+//                        j++; // 다음 0 데이터로 이동
+//                    } else if (arriveAttendance != null && (leaveAttendance == null || arriveAttendance.getAttendanceTime().isAfter(leaveAttendance.getAttendanceTime()))) {
+//                        leaveAttendance = null;
+//                        i++; // 다음 1 데이터로 이동
+//                    } else {
+//                        // 쌍을 이룰 수 있는 경우
+//                        i++;
+//                        j++;
+//                    }
+//
+//                    AttendancePairDto pair = new AttendancePairDto(arriveAttendance, leaveAttendance);
+//                    resultPairs.add(pair);
+//                    if(pair.getWorkDuration() != null)
+//                    {
+//                        totalDuration = totalDuration.plus(pair.getWorkDuration());
+//                    }
+//                }
+//            }
+//        }
+//        else
+//        {
+//            // 1과 0을 쌍으로 묶음
+//            for (Map.Entry<LocalDate, List<Attendance>> leaveEntry : leaveMap.entrySet()) {
+//                LocalDate date = leaveEntry.getKey();
+//                List<Attendance> arriveList = arriveMap.getOrDefault(date, new ArrayList<>());
+//                List<Attendance> leaveList = leaveEntry.getValue();
+//
+//                // 시간순으로 정렬
+//                arriveList.sort(Comparator.comparing(Attendance::getAttendanceTime));
+//                leaveList.sort(Comparator.comparing(Attendance::getAttendanceTime));
+//
+//                int i = 0, j = 0;
+//                while (i < arriveList.size() || j < leaveList.size()) {
+//                    Attendance arriveAttendance = (i < arriveList.size()) ? arriveList.get(i) : null;
+//                    Attendance leaveAttendance = (j < leaveList.size()) ? leaveList.get(j) : null;
+//
+//                    if (leaveAttendance != null && (arriveAttendance == null || leaveAttendance.getAttendanceTime().isBefore(arriveAttendance.getAttendanceTime()))) {
+//                        arriveAttendance = null;
+//                        j++; // 다음 0 데이터로 이동
+//                    } else if (arriveAttendance != null && (leaveAttendance == null || arriveAttendance.getAttendanceTime().isAfter(leaveAttendance.getAttendanceTime()))) {
+//                        leaveAttendance = null;
+//                        i++; // 다음 1 데이터로 이동
+//                    } else {
+//                        // 쌍을 이룰 수 있는 경우
+//                        i++;
+//                        j++;
+//                    }
+//
+//                    AttendancePairDto pair = new AttendancePairDto(arriveAttendance, leaveAttendance);
+//                    resultPairs.add(pair);
+//                    if(pair.getWorkDuration() != null)
+//                    {
+//                        totalDuration = totalDuration.plus(pair.getWorkDuration());
+//                    }
+//                }
+//            }
+//        }
+//
+//        AttendanceMonthResponseDto attendanceMonthData = new AttendanceMonthResponseDto();
+////        resultPairs.sort(Comparator
+////                .comparing((AttendancePairDto pair) -> pair.getArriveAttendance().getAttendanceDate())
+////                .thenComparing(pair -> pair.getArriveAttendance().getAttendanceTime()));
+//
+////        resultPairs.sort(Comparator
+////                .comparing((AttendancePairDto pair) -> {
+////                    Attendance arriveAttendance = pair.getArriveAttendance();
+////                    if (arriveAttendance != null) {
+////                        return arriveAttendance.getAttendanceDate();
+////                    } else {
+////                        // ArriveAttendance가 NULL인 경우 LeaveAttendance의 날짜를 반환
+////                        return pair.getLeaveAttendance().getAttendanceDate();
+////                    }
+////                })
+////                .thenComparing(pair -> {
+////                    Attendance arriveAttendance = pair.getArriveAttendance();
+////                    if (arriveAttendance != null) {
+////                        return arriveAttendance.getAttendanceTime();
+////                    } else {
+////                        // ArriveAttendance가 NULL인 경우 LeaveAttendance의 시간을 반환
+////                        return pair.getLeaveAttendance().getAttendanceTime();
+////                    }
+////                }));
+//
+//        attendanceMonthData.setAttendanceDataList(resultPairs);
+//        attendanceMonthData.setTotalDuration(totalDuration);
+//        System.out.println(totalDuration);
+////        return resultPairs;
+//        return attendanceMonthData;
+//    }
+public AttendanceMonthResponseDto pairAttendances(List<Attendance> attendances) {
+    List<AttendancePairDto> resultPairs = new ArrayList<>();
+    Duration totalDuration = Duration.ZERO;
+    Map<LocalDate, List<Attendance>> arriveMap = new HashMap<>();
+    Map<LocalDate, List<Attendance>> leaveMap = new HashMap<>();
 
-        Duration totalDuration = Duration.ZERO;
-
-        // 1과 0을 각각 모아놓을 맵
-        Map<LocalDate, List<Attendance>> arriveMap = new HashMap<>();
-        Map<LocalDate, List<Attendance>> leaveMap = new HashMap<>();
-
-        // 1과 0을 나누어 맵에 추가
-        for (Attendance attendance : attendances) {
-            if ("1".equals(attendance.getStatus())) {
-                arriveMap.computeIfAbsent(attendance.getAttendanceDate(), key -> new ArrayList<>()).add(attendance);
-            } else if ("0".equals(attendance.getStatus())) {
-                leaveMap.computeIfAbsent(attendance.getAttendanceDate(), key -> new ArrayList<>()).add(attendance);
-            }
+    for (Attendance attendance : attendances) {
+        if ("1".equals(attendance.getStatus())) {
+            arriveMap.computeIfAbsent(attendance.getAttendanceDate(), key -> new ArrayList<>()).add(attendance);
+        } else if ("0".equals(attendance.getStatus())) {
+            leaveMap.computeIfAbsent(attendance.getAttendanceDate(), key -> new ArrayList<>()).add(attendance);
         }
-
-        if(arriveMap.size() >= leaveMap.size())
-        {
-            // 1과 0을 쌍으로 묶음
-            for (Map.Entry<LocalDate, List<Attendance>> arriveEntry : arriveMap.entrySet()) {
-                LocalDate date = arriveEntry.getKey();
-                List<Attendance> arriveList = arriveEntry.getValue();
-                List<Attendance> leaveList = leaveMap.getOrDefault(date, new ArrayList<>());
-
-                // 시간순으로 정렬
-                arriveList.sort(Comparator.comparing(Attendance::getAttendanceTime));
-                leaveList.sort(Comparator.comparing(Attendance::getAttendanceTime));
-
-                int i = 0, j = 0;
-                while (i < arriveList.size() || j < leaveList.size()) {
-                    Attendance arriveAttendance = (i < arriveList.size()) ? arriveList.get(i) : null;
-                    Attendance leaveAttendance = (j < leaveList.size()) ? leaveList.get(j) : null;
-
-                    if (leaveAttendance != null && (arriveAttendance == null || leaveAttendance.getAttendanceTime().isBefore(arriveAttendance.getAttendanceTime()))) {
-                        arriveAttendance = null;
-                        j++; // 다음 0 데이터로 이동
-                    } else if (arriveAttendance != null && (leaveAttendance == null || arriveAttendance.getAttendanceTime().isAfter(leaveAttendance.getAttendanceTime()))) {
-                        leaveAttendance = null;
-                        i++; // 다음 1 데이터로 이동
-                    } else {
-                        // 쌍을 이룰 수 있는 경우
-                        i++;
-                        j++;
-                    }
-
-                    AttendancePairDto pair = new AttendancePairDto(arriveAttendance, leaveAttendance);
-                    resultPairs.add(pair);
-                    if(pair.getWorkDuration() != null)
-                    {
-                        totalDuration = totalDuration.plus(pair.getWorkDuration());
-                    }
-                }
-            }
-        }
-        else
-        {
-            // 1과 0을 쌍으로 묶음
-            for (Map.Entry<LocalDate, List<Attendance>> leaveEntry : leaveMap.entrySet()) {
-                LocalDate date = leaveEntry.getKey();
-                List<Attendance> arriveList = arriveMap.getOrDefault(date, new ArrayList<>());
-                List<Attendance> leaveList = leaveEntry.getValue();
-
-                // 시간순으로 정렬
-                arriveList.sort(Comparator.comparing(Attendance::getAttendanceTime));
-                leaveList.sort(Comparator.comparing(Attendance::getAttendanceTime));
-
-                int i = 0, j = 0;
-                while (i < arriveList.size() || j < leaveList.size()) {
-                    Attendance arriveAttendance = (i < arriveList.size()) ? arriveList.get(i) : null;
-                    Attendance leaveAttendance = (j < leaveList.size()) ? leaveList.get(j) : null;
-
-                    if (leaveAttendance != null && (arriveAttendance == null || leaveAttendance.getAttendanceTime().isBefore(arriveAttendance.getAttendanceTime()))) {
-                        arriveAttendance = null;
-                        j++; // 다음 0 데이터로 이동
-                    } else if (arriveAttendance != null && (leaveAttendance == null || arriveAttendance.getAttendanceTime().isAfter(leaveAttendance.getAttendanceTime()))) {
-                        leaveAttendance = null;
-                        i++; // 다음 1 데이터로 이동
-                    } else {
-                        // 쌍을 이룰 수 있는 경우
-                        i++;
-                        j++;
-                    }
-
-                    AttendancePairDto pair = new AttendancePairDto(arriveAttendance, leaveAttendance);
-                    resultPairs.add(pair);
-                    if(pair.getWorkDuration() != null)
-                    {
-                        totalDuration = totalDuration.plus(pair.getWorkDuration());
-                    }
-                }
-            }
-        }
-
-        AttendanceMonthResponseDto attendanceMonthData = new AttendanceMonthResponseDto();
-//        resultPairs.sort(Comparator
-//                .comparing((AttendancePairDto pair) -> pair.getArriveAttendance().getAttendanceDate())
-//                .thenComparing(pair -> pair.getArriveAttendance().getAttendanceTime()));
-
-        resultPairs.sort(Comparator
-                .comparing((AttendancePairDto pair) -> {
-                    Attendance arriveAttendance = pair.getArriveAttendance();
-                    if (arriveAttendance != null) {
-                        return arriveAttendance.getAttendanceDate();
-                    } else {
-                        // ArriveAttendance가 NULL인 경우 LeaveAttendance의 날짜를 반환
-                        return pair.getLeaveAttendance().getAttendanceDate();
-                    }
-                })
-                .thenComparing(pair -> {
-                    Attendance arriveAttendance = pair.getArriveAttendance();
-                    if (arriveAttendance != null) {
-                        return arriveAttendance.getAttendanceTime();
-                    } else {
-                        // ArriveAttendance가 NULL인 경우 LeaveAttendance의 시간을 반환
-                        return pair.getLeaveAttendance().getAttendanceTime();
-                    }
-                }));
-
-        attendanceMonthData.setAttendanceDataList(resultPairs);
-        attendanceMonthData.setTotalDuration(totalDuration);
-        System.out.println(totalDuration);
-//        return resultPairs;
-        return attendanceMonthData;
     }
+
+    for (LocalDate date : arriveMap.keySet()) {
+        List<Attendance> arriveList = arriveMap.getOrDefault(date, new ArrayList<>());
+        List<Attendance> leaveList = leaveMap.getOrDefault(date, new ArrayList<>());
+
+        arriveList.sort(Comparator.comparing(Attendance::getAttendanceTime));
+        leaveList.sort(Comparator.comparing(Attendance::getAttendanceTime));
+
+        int i = 0, j = 0;
+        while (i < arriveList.size() || j < leaveList.size()) {
+            Attendance arriveAttendance = (i < arriveList.size()) ? arriveList.get(i) : null;
+            Attendance leaveAttendance = (j < leaveList.size()) ? leaveList.get(j) : null;
+
+            if (leaveAttendance != null && (arriveAttendance == null || leaveAttendance.getAttendanceTime().isBefore(arriveAttendance.getAttendanceTime()))) {
+                // 퇴근 데이터만 있는 경우 짝을 만듦
+                AttendancePairDto pair = new AttendancePairDto(null, leaveAttendance);
+                resultPairs.add(pair);
+
+                if (pair.getWorkDuration() != null) {
+                    totalDuration = totalDuration.plus(pair.getWorkDuration());
+                }
+                j++;
+            } else if (arriveAttendance != null && (leaveAttendance == null || arriveAttendance.getAttendanceTime().isAfter(leaveAttendance.getAttendanceTime()))) {
+                // 출근 데이터만 있는 경우 짝을 만듦
+                AttendancePairDto pair = new AttendancePairDto(arriveAttendance, null);
+                resultPairs.add(pair);
+
+                if (pair.getWorkDuration() != null) {
+                    totalDuration = totalDuration.plus(pair.getWorkDuration());
+                }
+                i++;
+            } else {
+                // 출근과 퇴근 데이터가 모두 있는 경우
+                i++;
+                j++;
+
+                AttendancePairDto pair = new AttendancePairDto(arriveAttendance, leaveAttendance);
+                resultPairs.add(pair);
+
+                if (pair.getWorkDuration() != null) {
+                    totalDuration = totalDuration.plus(pair.getWorkDuration());
+                }
+            }
+        }
+    }
+
+    // 짝이 없는 퇴근 데이터를 고려하여 추가
+    for (LocalDate date : leaveMap.keySet()) {
+        List<Attendance> leaveList = leaveMap.getOrDefault(date, new ArrayList<>());
+        for (Attendance leaveAttendance : leaveList) {
+            if (!arriveMap.containsKey(date)) {
+                // 짝이 없는 퇴근 데이터 추가
+                AttendancePairDto pair = new AttendancePairDto(null, leaveAttendance);
+                resultPairs.add(pair);
+
+                if (pair.getWorkDuration() != null) {
+                    totalDuration = totalDuration.plus(pair.getWorkDuration());
+                }
+            }
+        }
+    }
+
+    resultPairs.sort(Comparator
+            .comparing((AttendancePairDto pair) -> {
+                Attendance arriveAttendance = pair.getArriveAttendance();
+                if (arriveAttendance != null) {
+                    return arriveAttendance.getAttendanceDate();
+                } else {
+                    // ArriveAttendance가 NULL인 경우 LeaveAttendance의 날짜를 반환
+                    return pair.getLeaveAttendance().getAttendanceDate();
+                }
+            })
+            .thenComparing(pair -> {
+                Attendance arriveAttendance = pair.getArriveAttendance();
+                if (arriveAttendance != null) {
+                    return arriveAttendance.getAttendanceTime();
+                } else {
+                    // ArriveAttendance가 NULL인 경우 LeaveAttendance의 시간을 반환
+                    return pair.getLeaveAttendance().getAttendanceTime();
+                }
+            }));
+
+    AttendanceMonthResponseDto attendanceMonthData = new AttendanceMonthResponseDto();
+    attendanceMonthData.setAttendanceDataList(resultPairs);
+    attendanceMonthData.setTotalDuration(totalDuration);
+
+    return attendanceMonthData;
+}
 
 //
 //    private MonthlyAttendanceResponseDto convertToMonthlyAttendanceResponse(Attendance attendance) {
