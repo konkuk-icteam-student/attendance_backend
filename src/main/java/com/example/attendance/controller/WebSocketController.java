@@ -37,6 +37,7 @@ package com.example.attendance.controller;
 
 import com.example.attendance.model.dto.DeptIdRequest;
 import com.example.attendance.model.dto.UserInfo;
+import com.example.attendance.service.AttendanceService;
 import com.example.attendance.service.UserService;
 import com.example.attendance.service.WebSocketService;
 import jakarta.persistence.EntityNotFoundException;
@@ -55,6 +56,8 @@ import java.util.List;
 @RequiredArgsConstructor
 @Controller
 public class WebSocketController {
+
+    public final AttendanceService attendanceService;
     public final UserService userService;
 //    @MessageMapping("/dept")
 //    @SendTo("/topic/currentMember/{deptId}")
@@ -84,7 +87,7 @@ public class WebSocketController {
 public List<UserInfo> sendAttendance(@DestinationVariable Long deptId) {
     try {
 
-        List<UserInfo> currentAttendanceUsers = userService.getCurrentAttendanceUsers(deptId);
+        List<UserInfo> currentAttendanceUsers = attendanceService.getCurrentAttendanceUsers(deptId);
         System.out.println(deptId);
         System.out.println("--------send code----------");
         return currentAttendanceUsers;

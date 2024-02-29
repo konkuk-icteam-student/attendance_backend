@@ -1,12 +1,10 @@
 package com.example.attendance.controller;
 
 import com.example.attendance.exception.DuplicateUserIdException;
-import com.example.attendance.model.dto.DeptGetResponseDto;
-import com.example.attendance.model.dto.SemesterGetResponseDto;
-import com.example.attendance.model.dto.UserCreateRequest;
-import com.example.attendance.model.dto.WorkSemesterCreateRequest;
+import com.example.attendance.model.dto.*;
 import com.example.attendance.model.entity.SiteUser;
 import com.example.attendance.model.entity.WorkSemester;
+import com.example.attendance.service.UserSemesterService;
 import com.example.attendance.service.UserService;
 import com.example.attendance.service.WorkSemesterService;
 import jakarta.persistence.EntityNotFoundException;
@@ -24,6 +22,9 @@ import java.util.List;
 @RequestMapping("/semester")
 public class WorkSemesterController {
     public final WorkSemesterService workSemesterService;
+
+    public final UserSemesterService userSemesterService;
+
     @PostMapping("/new-semester")
     public ResponseEntity<Object> saveSemester(@RequestBody WorkSemesterCreateRequest request){
         try{
@@ -47,6 +48,16 @@ public class WorkSemesterController {
             return new ResponseEntity<>("학기가 성공적으로 삭제되었습니다.", HttpStatus.OK);
         } catch (EntityNotFoundException e) {
             return new ResponseEntity<>("해당 학기를 찾을 수 없습니다.", HttpStatus.NOT_FOUND);
+        }
+    }
+
+    @PostMapping("/semester")
+    public ResponseEntity<Object> setSemester(@RequestBody UserSetSemesterRequest request){
+        try{
+            String message = this.userSemesterService.create(request);
+            return new ResponseEntity<>(message,HttpStatus.CREATED);
+        }catch(EntityNotFoundException e){
+            return new ResponseEntity<>("해당 학기가 존재하지 않습니다.", HttpStatus.CONFLICT);
         }
     }
 }
