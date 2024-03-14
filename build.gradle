@@ -2,14 +2,6 @@
 	id 'java'
 	id 'org.springframework.boot' version '3.1.5'
 	id 'io.spring.dependency-management' version '1.1.3'
-		id 'war'
-}
-
-	apply plugin:'war'
-bootWar{
-	archiveBaseName = 'Attendance'
-	archiveFileName = 'Attendance.war'
-	archiveVersion = "0.0.0"
 }
 
 group = 'com.example'
@@ -36,7 +28,7 @@ dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-websocket'
     compileOnly 'org.projectlombok:lombok'
 	//developmentOnly 'org.springframework.boot:spring-boot-devtools'
-	providedRuntime 'org.springframework.boot:spring-boot-starter-tomcat'
+//	providedRuntime 'org.springframework.boot:spring-boot-starter-tomcat'
 	annotationProcessor 'org.projectlombok:lombok'
 	testImplementation 'org.springframework.boot:spring-boot-starter-test'
 	testImplementation 'org.springframework.security:spring-security-test'
@@ -53,10 +45,6 @@ dependencies {
 
 	//swagger
 	implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui:2.3.0'
-}
-
-tasks.named('bootBuildImage') {
-	builder = 'paketobuildpacks/builder-jammy-base:latest'
 }
 
 tasks.named('test') {
