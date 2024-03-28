@@ -22,6 +22,7 @@ public class AttendanceController {
 
     @PostMapping("/attendance")
     public ResponseEntity<Object> saveAttendance(@RequestBody UserAttendanceRequest request) {
+        System.out.println();
         try {
             long startTime = System.currentTimeMillis();
             String message = this.attendanceService.attendanceCreate(request);
