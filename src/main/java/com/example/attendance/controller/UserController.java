@@ -35,7 +35,6 @@ public class UserController {
 
     //public final UserSemesterService userSemesterService;
 
-
     @PostMapping("/new-user")
     public ResponseEntity<Object> saveUser(@RequestBody UserCreateRequest request){
         try{
