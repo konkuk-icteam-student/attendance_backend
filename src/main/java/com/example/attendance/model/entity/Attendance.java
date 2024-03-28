@@ -14,6 +14,7 @@ import java.time.LocalDateTime;
 @Setter
 @Entity
 public class Attendance {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)//mysql의 auto increment
     private Long id;
@@ -38,7 +39,6 @@ public class Attendance {
 
     @Column
     private LocalDateTime createTime;
-
 
 //새로 추가
     @Column

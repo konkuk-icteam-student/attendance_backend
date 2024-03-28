@@ -8,8 +8,6 @@ import org.springframework.web.reactive.function.client.WebClient;
 public class WebHookService {
     private final WebClient webClient;
 
-
-
     public WebHookService(WebClient.Builder webClientBuilder){
         this.webClient = webClientBuilder.baseUrl("https://teamroom.nate.com").build();
     }
@@ -36,5 +34,4 @@ public class WebHookService {
                 .bodyToMono(String.class)
                 .block();
     }
-
 }

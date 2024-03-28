@@ -50,8 +50,6 @@ public class UserService {
         this.userAttendanceRepository = userAttendanceRepository;
         this.deptService = deptService;
         this.studentWorkSemesterRepository = studentWorkSemesterRepository;
-
-
     }
 
     public UserInfo create(UserCreateRequest request){
