@@ -23,6 +23,8 @@ public interface UserAttendanceRepository extends JpaRepository<Attendance,Long>
 
     List<Attendance> findBySiteUserId(Long userId);
 
+    List<Attendance> findBySiteUserOrderByAttendanceTimeDesc(SiteUser user);
+
 //    List<Attendance> findBySiteUserId(Long userId);
 //    ListfindBySiteUser_Id();
 }

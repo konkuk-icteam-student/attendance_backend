@@ -39,6 +39,10 @@ public class AttendanceService {
             throw new EntityNotFoundException("해당 userId의 유저를 찾을 수 없습니다.");
         }
 
+        if(!canStartTime(user)){
+            throw new RuntimeException("출근한 지 1시간 미만입니다.");
+        }
+
         //int day_attendance_sum = userAttendanceRepository.findBySiteUserAndAttendanceDate(user, LocalDate.now()).size();
 
         Attendance attendance = new Attendance();
@@ -280,6 +284,26 @@ public class AttendanceService {
         userInfo.setUserName(user.getUserName());
         userInfo.setUserPhoneNum(user.getUserPhoneNum());
         return userInfo;
+    }
+
+    private boolean canStartTime(SiteUser user){
+        //사용자의 최근 출근 기록 가져오기
+        List<Attendance> lastAttendances = userAttendanceRepository.findBySiteUserOrderByAttendanceTimeDesc(user);
+
+        if (!lastAttendances.isEmpty()) {
+            Attendance lastAttendance = lastAttendances.get(0);
+            LocalDateTime currentTime = LocalDateTime.now();
+            LocalDateTime lastAttendanceTime = lastAttendance.getAttendanceTime();
+
+            // 현재 시간과 마지막 출근 시간의 차이 계산
+            Duration duration = Duration.between(lastAttendanceTime, currentTime);
+
+            // 1시간이 지났는지 확인
+            if (duration.toHours() < 1) {
+                return false; // 이미 출근을 찍은 상태
+            }
+        }
+        return true; // 출근 가능한 상태
     }
 
 

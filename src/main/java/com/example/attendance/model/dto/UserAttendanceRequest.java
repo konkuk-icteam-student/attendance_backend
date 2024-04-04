@@ -11,7 +11,7 @@ public class UserAttendanceRequest {
 
     private String userId;
     //private LocalDateTime attendanceTime;
-    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss.SSS")
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm")
     private LocalDateTime attendanceTime;
 
     @JsonFormat(pattern = "yyyy-MM-dd")
