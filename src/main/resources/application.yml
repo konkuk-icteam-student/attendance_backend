@@ -1,7 +1,7 @@
 spring:
   datasource:
     driver-class-name: org.postgresql.Driver
-    url: jdbc:postgresql://localhost:5432/spring?user=posgresql&password=1234
+    url: jdbc:postgresql://localhost:5434/test?user=postgres&password=1234
   jpa:
     database: postgresql
     database-platform: org.hibernate.dialect.PostgreSQLDialect
@@ -11,11 +11,16 @@ spring:
         format_sql: true
         use_sql_comments: true
     hibernate:
-      ddl-auto: validate
+      ddl-auto: create
     defer-datasource-initialization: true
   profiles:
     include: aws, swagger, auth
   sql:
     init:
       mode: always
+
+logging:
+  level:
+    org.springframework.security: TRACE
+
 
