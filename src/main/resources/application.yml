@@ -1,0 +1,29 @@
+spring:
+  datasource:
+    driver-class-name: org.postgresql.Driver
+    url: jdbc:postgresql://localhost:5433/spring?user=postgres&password=1234
+  #    url: jdbc:postgresql://host.docker.internal:5433/spring?user=postgres&password=1234
+  jpa:
+    database: postgresql
+    database-platform: org.hibernate.dialect.PostgreSQLDialect
+    properties:
+      hibernate:
+        show_sql: true
+        format_sql: true
+        use_sql_comments: true
+    hibernate:
+      ddl-auto: validate
+    defer-datasource-initialization: true
+  profiles:
+    include: aws, swagger, auth
+  sql:
+    init:
+      mode: always
+server:
+  port: 8080
+
+logging:
+  level:
+    org.springframework.security: TRACE
+
+
