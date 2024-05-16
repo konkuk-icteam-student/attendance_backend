@@ -1,10 +1,14 @@
 package com.example.attendance.domain.attendance.entity;
 
+import com.example.attendance.domain.BaseTimeEntity;
 import com.example.attendance.domain.member.entity.Member;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
+import lombok.Builder;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
+import lombok.experimental.SuperBuilder;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -13,7 +17,9 @@ import java.time.LocalDateTime;
 @Getter
 @Setter
 @Entity
-public class Attendance {
+@NoArgsConstructor
+@SuperBuilder
+public class Attendance extends BaseTimeEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)//mysql의 auto increment
@@ -42,4 +48,14 @@ public class Attendance {
     //새로 추가
     @Column
     private String status;
+
+    @Builder
+    public Attendance(Long id, LocalDateTime attendanceTime, LocalDate attendanceDate, String createId, LocalDateTime createTime, String status) {
+        this.id = id;
+        this.attendanceTime = attendanceTime;
+        this.attendanceDate = attendanceDate;
+        this.createId = createId;
+        this.createTime = createTime;
+        this.status = status;
+    }
 }

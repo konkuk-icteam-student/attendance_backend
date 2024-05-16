@@ -1,12 +1,13 @@
 package com.example.attendance.domain.legacy.service;
 
-import com.example.attendance.exception.DuplicateUserIdException;
 import com.example.attendance.domain.legacy.model.dto.SemesterGetResponseDto;
 import com.example.attendance.domain.legacy.model.dto.WorkSemesterCreateRequest;
 import com.example.attendance.domain.legacy.model.entity.StudentWorkSemester;
 import com.example.attendance.domain.legacy.model.entity.WorkSemester;
 import com.example.attendance.domain.legacy.model.repository.StudentWorkSemesterRepository;
 import com.example.attendance.domain.legacy.model.repository.WorkSemesterRepository;
+import com.example.attendance.exception.ErrorCode;
+import com.example.attendance.exception.NotEqualsException;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -21,9 +22,12 @@ public class WorkSemesterService {
     private final WorkSemesterRepository workSemesterRepository;
     private final StudentWorkSemesterRepository studentWorkSemesterRepository;
 
-    public WorkSemester create(WorkSemesterCreateRequest request){
-        if (workSemesterRepository.existsByYearAndSemester(request.getYear(),request.getSemester())) {
-            throw new DuplicateUserIdException("Semester " + request.getYear() +"년도"+request.getSemester()+"학기"+" already exists");
+    public WorkSemester create(WorkSemesterCreateRequest request) {
+        /**
+         * 예외 처리 다시하기 (임시)
+         */
+        if (workSemesterRepository.existsByYearAndSemester(request.getYear(), request.getSemester())) {
+            throw new NotEqualsException(ErrorCode.SAMPLE_ERROR, "Semester " + request.getYear() + "년도" + request.getSemester() + "학기" + " already exists");
         }
 
         WorkSemester workSemester = new WorkSemester();
@@ -33,6 +37,7 @@ public class WorkSemesterService {
         workSemester.setCreateTime(null);
         return this.workSemesterRepository.save(workSemester);
     }
+
     public void deleteSemester(Long semesterId) {
         Optional<WorkSemester> optionalSemester = workSemesterRepository.findById(semesterId);
 
@@ -50,11 +55,11 @@ public class WorkSemesterService {
     }
 
     public List getAllWorkSemesters() {
-        List<WorkSemester> resultList =  workSemesterRepository.findAll();
+        List<WorkSemester> resultList = workSemesterRepository.findAll();
 
         List<SemesterGetResponseDto> semesterList = new ArrayList<>();
 
-        for(WorkSemester semester : resultList){
+        for (WorkSemester semester : resultList) {
             SemesterGetResponseDto dto = new SemesterGetResponseDto();
             dto.setId(semester.getId());
             dto.setYear(semester.getYear());

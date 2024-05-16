@@ -1,11 +1,11 @@
 package com.example.attendance.domain.department.controller;
 
-import com.example.attendance.domain.legacy.model.dto.DeptGetResponseDto;
+import com.example.attendance.domain.department.dto.DeptGetResponse;
+import com.example.attendance.domain.department.entity.Dept;
+import com.example.attendance.domain.department.service.DeptService;
 import com.example.attendance.domain.legacy.model.dto.DeptCreateRequest;
 import com.example.attendance.domain.legacy.model.dto.DeptUpdateRequestDto;
 import com.example.attendance.domain.legacy.model.dto.DeptUpdateResponseDto;
-import com.example.attendance.domain.department.entity.Dept;
-import com.example.attendance.domain.department.service.DeptService;
 import jakarta.persistence.EntityExistsException;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
@@ -26,8 +26,8 @@ public class DeptController {
     public final DeptService deptService;
 
     @PostMapping("/new-dept")
-    public ResponseEntity<Object> saveDept(@RequestBody DeptCreateRequest request){
-        try{
+    public ResponseEntity<Object> saveDept(@RequestBody DeptCreateRequest request) {
+        try {
             Dept createdDept = this.deptService.create(request);
             return new ResponseEntity<>(createdDept, HttpStatus.CREATED);
         } catch (EntityExistsException e) {
@@ -36,15 +36,15 @@ public class DeptController {
     }
 
     @GetMapping("/list")
-    public ResponseEntity<List<DeptGetResponseDto>> getAllDepartments() {
-        List<DeptGetResponseDto> allDepartments = deptService.getAllDepartments();
+    public ResponseEntity<List<DeptGetResponse>> getAllDepartments() {
+        List<DeptGetResponse> allDepartments = deptService.getAllDepartments();
         return new ResponseEntity<>(allDepartments, HttpStatus.OK);
     }
 
     @Transactional
     @GetMapping("/{deptId}")
-    public ResponseEntity<DeptGetResponseDto> getDepartments(@PathVariable Long deptId) {
-        DeptGetResponseDto dept = deptService.getDepartments(deptId);
+    public ResponseEntity<DeptGetResponse> getDepartments(@PathVariable Long deptId) {
+        DeptGetResponse dept = deptService.getDepartments(deptId);
         return new ResponseEntity<>(dept, HttpStatus.OK);
     }
 
@@ -55,7 +55,7 @@ public class DeptController {
             return new ResponseEntity<>(updatedDept, HttpStatus.OK);
         } catch (EntityNotFoundException e) {
             return new ResponseEntity<>("부서를 찾을 수 없습니다.", HttpStatus.NOT_FOUND);
-        } catch (EntityExistsException e){
+        } catch (EntityExistsException e) {
             return new ResponseEntity<>("이미 존재하는 부서입니다.", HttpStatus.CONFLICT);
         }
 

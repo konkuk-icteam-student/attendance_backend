@@ -16,7 +16,7 @@ public class AttendanceGetResponse {
 
     private String UserId;
     private String deptName;
-    //private String userId;
+    //private String loginId;
     private String userName;
     //private String userPw;
 }

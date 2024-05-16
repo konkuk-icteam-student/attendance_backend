@@ -2,9 +2,9 @@ package com.example.attendance.domain.attendance.controller;
 
 import com.example.attendance.domain.attendance.dto.AttendanceGetResponse;
 import com.example.attendance.domain.attendance.dto.AttendanceMonthResponseDto;
+import com.example.attendance.domain.attendance.service.AttendanceService;
 import com.example.attendance.domain.legacy.model.dto.UserAttendanceRequest;
 import com.example.attendance.domain.member.dto.MemberInfoResponse;
-import com.example.attendance.domain.attendance.service.AttendanceService;
 import io.swagger.v3.oas.annotations.Operation;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
@@ -28,7 +28,7 @@ public class AttendanceController {
             long startTime = System.currentTimeMillis();
             String message = this.attendanceService.attendanceCreate(request);
             long stopTime = System.currentTimeMillis();
-            System.out.println("attendance duration total time :"+(stopTime - startTime));
+            System.out.println("attendance duration total time :" + (stopTime - startTime));
             return new ResponseEntity<>(message, HttpStatus.CREATED);
         } catch (EntityNotFoundException e) {
             return new ResponseEntity<>("유저를 찾을 수 없습니다.", HttpStatus.NOT_FOUND);
@@ -36,14 +36,14 @@ public class AttendanceController {
     }
 
     @PostMapping("/admin-attendance")
-    public ResponseEntity<Object> saveRequiredAttendance(@RequestBody UserAttendanceRequest request){
-        return new ResponseEntity<>(this.attendanceService.requiredAttendanceCreate(request),HttpStatus.CREATED);
+    public ResponseEntity<Object> saveRequiredAttendance(@RequestBody UserAttendanceRequest request) {
+        return new ResponseEntity<>(this.attendanceService.requiredAttendanceCreate(request), HttpStatus.CREATED);
     }
 
     @GetMapping("attendance-log")
-    public ResponseEntity<List<AttendanceGetResponse>> getAttendance(){
+    public ResponseEntity<List<AttendanceGetResponse>> getAttendance() {
         List<AttendanceGetResponse> dtoList = this.attendanceService.attendanceGet();
-        return new ResponseEntity<>(dtoList,HttpStatus.OK);
+        return new ResponseEntity<>(dtoList, HttpStatus.OK);
     }
 
     @PutMapping("/attendance/{attendanceId}")
@@ -70,7 +70,7 @@ public class AttendanceController {
     @GetMapping("/attendance/monthly/{userId}")
     public ResponseEntity<Object> getUserMonthlyAttendance(@PathVariable String userId, @RequestParam int year, @RequestParam int month) {
         try {
-//            List<AttendancePairDto> monthlyAttendancePairs = userService.getUserMonthlyAttendancePairs(userId, year, month);
+//            List<AttendancePairDto> monthlyAttendancePairs = userService.getUserMonthlyAttendancePairs(loginId, year, month);
             AttendanceMonthResponseDto monthlyAttendanceData = attendanceService.getUserMonthlyAttendancePairs(userId, year, month);
             return new ResponseEntity<>(monthlyAttendanceData, HttpStatus.OK);
         } catch (EntityNotFoundException e) {

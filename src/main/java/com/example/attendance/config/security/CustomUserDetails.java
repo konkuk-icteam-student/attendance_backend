@@ -1,7 +1,7 @@
 package com.example.attendance.config.security;
 
-import com.example.attendance.domain.member.entity.Member;
 import com.example.attendance.domain.member.entity.Role;
+import lombok.Builder;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -16,15 +16,32 @@ public class CustomUserDetails implements UserDetails {
 
     private final String password;
 
-    private final String name;
+    private final Long memberId;
 
     private final Role role;
 
-    public CustomUserDetails(Member member) {
-        this.loginId = member.getLoginId();
-        this.password = member.getLoginPassword();
-        this.name = member.getName();
-        this.role = member.getRole();
+    @Builder
+    public CustomUserDetails(String loginId, String password, Long memberId, Role role) {
+        this.loginId = loginId;
+        this.password = password;
+        this.memberId = memberId;
+        this.role = role;
+    }
+
+    public static CustomUserDetails forSession(Long memberId, Role role) {
+        return CustomUserDetails.builder()
+                .memberId(memberId)
+                .role(role)
+                .build();
+    }
+
+    public static CustomUserDetails forLogin(String loginId, String password, Long memberId, Role role) {
+        return CustomUserDetails.builder()
+                .loginId(loginId)
+                .password(password)
+                .memberId(memberId)
+                .role(role)
+                .build();
     }
 
     @Override
@@ -62,5 +79,9 @@ public class CustomUserDetails implements UserDetails {
     @Override
     public boolean isEnabled() {
         return true;
+    }
+
+    public Long getMemberId() {
+        return memberId;
     }
 }

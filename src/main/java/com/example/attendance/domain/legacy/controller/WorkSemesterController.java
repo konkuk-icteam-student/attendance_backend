@@ -3,10 +3,10 @@ package com.example.attendance.domain.legacy.controller;
 import com.example.attendance.domain.legacy.model.dto.SemesterGetResponseDto;
 import com.example.attendance.domain.legacy.model.dto.UserSetSemesterRequest;
 import com.example.attendance.domain.legacy.model.dto.WorkSemesterCreateRequest;
-import com.example.attendance.exception.DuplicateUserIdException;
 import com.example.attendance.domain.legacy.model.entity.WorkSemester;
 import com.example.attendance.domain.legacy.service.UserSemesterService;
 import com.example.attendance.domain.legacy.service.WorkSemesterService;
+import com.example.attendance.exception.DuplicateException;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -25,11 +25,11 @@ public class WorkSemesterController {
     public final UserSemesterService userSemesterService;
 
     @PostMapping("/new-semester")
-    public ResponseEntity<Object> saveSemester(@RequestBody WorkSemesterCreateRequest request){
-        try{
+    public ResponseEntity<Object> saveSemester(@RequestBody WorkSemesterCreateRequest request) {
+        try {
             WorkSemester createdSemester = this.workSemesterService.create(request);
             return new ResponseEntity<>(createdSemester, HttpStatus.CREATED);
-        } catch (DuplicateUserIdException e) {
+        } catch (DuplicateException e) {
             return new ResponseEntity<>("이미 존재하는 학기입니다.", HttpStatus.CONFLICT);
         }
     }
@@ -51,11 +51,11 @@ public class WorkSemesterController {
     }
 
     @PostMapping("/semester")
-    public ResponseEntity<Object> setSemester(@RequestBody UserSetSemesterRequest request){
-        try{
+    public ResponseEntity<Object> setSemester(@RequestBody UserSetSemesterRequest request) {
+        try {
             String message = this.userSemesterService.create(request);
-            return new ResponseEntity<>(message,HttpStatus.CREATED);
-        }catch(EntityNotFoundException e){
+            return new ResponseEntity<>(message, HttpStatus.CREATED);
+        } catch (EntityNotFoundException e) {
             return new ResponseEntity<>("해당 학기가 존재하지 않습니다.", HttpStatus.CONFLICT);
         }
     }

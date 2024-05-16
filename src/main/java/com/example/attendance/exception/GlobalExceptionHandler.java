@@ -25,5 +25,11 @@ public class GlobalExceptionHandler {
         errorResponse.setDetail(e.getMessage());
         return new ResponseEntity<>(errorResponse, errorCode.getStatus());
     }
+
+//    @ExceptionHandler
+//    protected ResponseEntity<String> handleRuntimeException(RuntimeException e) {
+//        return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
+//    }
+
 }
 

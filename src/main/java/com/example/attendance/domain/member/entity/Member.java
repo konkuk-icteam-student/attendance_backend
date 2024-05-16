@@ -1,5 +1,6 @@
 package com.example.attendance.domain.member.entity;
 
+import com.example.attendance.domain.BaseTimeEntity;
 import com.example.attendance.domain.attendance.entity.Attendance;
 import com.example.attendance.domain.department.entity.Dept;
 import com.example.attendance.domain.legacy.model.entity.StudentWorkSemester;
@@ -9,27 +10,29 @@ import jakarta.persistence.*;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.experimental.SuperBuilder;
 
 import java.util.List;
 
 @Getter
 @Entity
+@SuperBuilder
 @NoArgsConstructor
-public class Member {
+public class Member extends BaseTimeEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)//mysql의 auto increment
     private Long id;
 
-    @Column(length = 20)
+    @Column
     private String loginId;
 
-    @Column(length = 20)
+    @Column
     private String loginPassword;
 
-    @Column(length = 200)
+    @Column
     private String name;
 
-    @Column(length = 11)
+    @Column
     private String phoneNumber;
 
     @Enumerated(EnumType.STRING)

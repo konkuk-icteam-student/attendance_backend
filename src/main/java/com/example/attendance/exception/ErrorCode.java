@@ -14,17 +14,23 @@ public enum ErrorCode {
     METHOD_NOT_ALLOWED(HttpStatus.METHOD_NOT_ALLOWED, "지원하지 않는 HTTP method 입니다."),
     INTERNAL_SERVER_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, "서버 오류, 관리자에게 문의하세요"),
 
+
     // Member
     MEMBER_NOT_FOUND(HttpStatus.NOT_FOUND, "해당 회원을 찾을 수 없습니다."),
     MEMBER_NOT_AUTHORIZED_TO_ANNOUNCE(HttpStatus.BAD_REQUEST, "이 회원은 해당 공지를 할 권한이 없습니다."),
     IS_NOT_TEACHER(HttpStatus.BAD_REQUEST, "해당 회원은 선생님 회원이 아닙니다"),
     IS_NOT_STUDENT(HttpStatus.BAD_REQUEST, "해당 회원은 학생 회원이 아닙니다"),
     PASSWORD_INCORRECT(HttpStatus.BAD_REQUEST, "비밀번호가 일치하지 않습니다"),
+    LOGINID_DUPLICATED(HttpStatus.BAD_REQUEST, "이미 존재하는 학번입니다"),
+    IS_NOT_LOGINED(HttpStatus.BAD_REQUEST, "현재 로그인 중이 아닙니다."),
 
     //Dept
     DEPT_NOT_FOUND(HttpStatus.NOT_FOUND, "해당 부서를 찾을 수 없습니다."),
+    DUPLICATE_DEPT_NAME(HttpStatus.BAD_REQUEST, "이미 존재하는 부서명입니다."),
 
     // Security
+    ID_OR_PW_EMPTY(HttpStatus.BAD_REQUEST, "아이디나 비밀번호가 비어있습니다"),
+
     AUTH_NOT_FOUND(HttpStatus.INTERNAL_SERVER_ERROR, "시큐리티 인증 정보를 찾을 수 없습니다."),
     EXPIRED_JWT_TOKEN(HttpStatus.UNAUTHORIZED, "만료된 JWT 토큰입니다."),
     MEMBER_ALREADY_REGISTERED(HttpStatus.CONFLICT, "이미 가입된 회원입니다."),
