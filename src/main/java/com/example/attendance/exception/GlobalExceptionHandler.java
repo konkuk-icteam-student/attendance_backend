@@ -1,5 +1,6 @@
 package com.example.attendance.exception;
 
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -25,6 +26,14 @@ public class GlobalExceptionHandler {
         errorResponse.setDetail(e.getMessage());
         return new ResponseEntity<>(errorResponse, errorCode.getStatus());
     }
+
+    @ExceptionHandler(Exception.class)
+    public ResponseEntity<String> handleUnKnownException(Exception ex) {
+        String errorMessage = ex.getMessage();
+
+        return new ResponseEntity<>(errorMessage, HttpStatus.BAD_REQUEST);
+    }
+
 
 //    @ExceptionHandler
 //    protected ResponseEntity<String> handleRuntimeException(RuntimeException e) {
