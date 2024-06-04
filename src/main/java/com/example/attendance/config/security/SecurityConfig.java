@@ -26,7 +26,7 @@ public class SecurityConfig {
     private final LoginAuthenticationEntryPoint authenticationEntryPoint;
     private final LoginAccessDeniedHandler accessDeniedHandler;
 
-    String[] allowUrls = {"/user/*", "/member/isLogin", "/swagger-ui/**", "/v3/**", "/member/signUp", "/member/login", "/ws/**", "/dept/*"};
+    String[] allowUrls = {"/user/*", "/member/isLogin", "/swagger-ui/**", "/v3/**", "/member/signUp", "/member/login", "/member/logout", "/", "/ws/**", "/dept/*"};
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
