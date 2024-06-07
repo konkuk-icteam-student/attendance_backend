@@ -13,6 +13,8 @@ public class WebConfig implements WebMvcConfigurer {
                 .allowedOrigins("http://localhost:3000")
                 .allowedOrigins("http://114.70.23.79:3000")// 허용할 오리진 지정
                 .allowedMethods("GET", "POST", "PUT", "DELETE")  // 허용할 HTTP 메소드 지정
-                .allowCredentials(true);
+                .allowCredentials(true)
+                .allowedHeaders("*")
+                .maxAge(3600);
     }
 }
