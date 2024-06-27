@@ -14,7 +14,6 @@ import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
-import java.util.Arrays;
 import java.util.List;
 
 
@@ -26,7 +25,7 @@ public class SecurityConfig {
     private final LoginAuthenticationEntryPoint authenticationEntryPoint;
     private final LoginAccessDeniedHandler accessDeniedHandler;
 
-    String[] allowUrls = {"/user/*", "/member/isLogin", "/swagger-ui/**", "/v3/**", "/member/signUp", "/member/login", "/member/logout", "/", "/ws/**", "/dept/*"};
+    String[] allowUrls = {"/user/*", "/member/isLogin", "/swagger-ui/**", "/v3/**", "/member/signUp", "/member/login", "/member/logout", "/", "/ws/**", "/dept/**"};
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
@@ -49,9 +48,10 @@ public class SecurityConfig {
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
         configuration.setAllowedOrigins(List.of("http://localhost:3000", "http://114.70.23.79:3000")); // 허용할 오리진 지정
-        configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE")); // 허용할 메소드
+        configuration.addAllowedMethod("*");
         configuration.setAllowedHeaders(List.of("*")); // 허용할 헤더
-
+        configuration.setAllowCredentials(true);
+        
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         source.registerCorsConfiguration("/**", configuration); // 모든 경로에 적용
         return source;
