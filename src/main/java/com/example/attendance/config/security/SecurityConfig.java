@@ -25,7 +25,7 @@ public class SecurityConfig {
     private final LoginAuthenticationEntryPoint authenticationEntryPoint;
     private final LoginAccessDeniedHandler accessDeniedHandler;
 
-    String[] allowUrls = {"/user/*", "/member/isLogin", "/swagger-ui/**", "/v3/**", "/member/signUp", "/member/login", "/member/logout", "/", "/ws/**", "/dept/**"};
+    String[] allowUrls = {"/user/*", "/member/isLogin", "/swagger-ui/**", "/v3/**", "/member/signUp", "/member/login", "/member/logout", "/", "/ws/**", "/dept/**", "/user/**"};
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
@@ -51,7 +51,7 @@ public class SecurityConfig {
         configuration.addAllowedMethod("*");
         configuration.setAllowedHeaders(List.of("*")); // 허용할 헤더
         configuration.setAllowCredentials(true);
-        
+
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         source.registerCorsConfiguration("/**", configuration); // 모든 경로에 적용
         return source;
