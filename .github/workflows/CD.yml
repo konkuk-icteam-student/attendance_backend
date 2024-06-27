@@ -17,6 +17,7 @@ jobs:
             cd ~/info_team_attendance/attendance_backend
             git fetch origin main
             git merge origin/main
+            ./gradlew build
             docker rm -f info_team_attendance_front_1 info_team_attendance_back_1
             docker rmi info_team_attendance_back
             cd ..
