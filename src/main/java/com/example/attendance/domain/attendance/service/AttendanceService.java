@@ -3,20 +3,21 @@ package com.example.attendance.domain.attendance.service;
 import com.example.attendance.domain.attendance.dto.AttendanceGetResponse;
 import com.example.attendance.domain.attendance.dto.AttendanceMonthResponseDto;
 import com.example.attendance.domain.attendance.dto.AttendancePairDto;
-import com.example.attendance.domain.legacy.model.dto.UserAttendanceRequest;
-import com.example.attendance.domain.member.dto.MemberInfoResponse;
 import com.example.attendance.domain.attendance.entity.Attendance;
-import com.example.attendance.domain.department.entity.Dept;
-import com.example.attendance.domain.member.entity.Member;
-import com.example.attendance.domain.legacy.model.repository.DeptRepository;
 import com.example.attendance.domain.attendance.entity.AttendanceRepository;
-import com.example.attendance.domain.member.entity.MemberRepository;
+import com.example.attendance.domain.department.entity.Dept;
+import com.example.attendance.domain.legacy.model.dto.UserAttendanceRequest;
+import com.example.attendance.domain.legacy.model.repository.DeptRepository;
 import com.example.attendance.domain.legacy.service.WebHookService;
 import com.example.attendance.domain.legacy.service.WebSocketService;
+import com.example.attendance.domain.member.dto.MemberInfoResponse;
+import com.example.attendance.domain.member.entity.Member;
+import com.example.attendance.domain.member.entity.MemberRepository;
 import com.example.attendance.exception.ErrorCode;
 import com.example.attendance.exception.NotFoundException;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -25,6 +26,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.*;
 
+@Slf4j
 @RequiredArgsConstructor
 @Service
 public class AttendanceService {
@@ -38,6 +40,7 @@ public class AttendanceService {
 
     public String attendanceCreate(UserAttendanceRequest request) {
         long startTime1 = System.currentTimeMillis();
+        log.info("학번 : {}", request.getLoginId());
         Member member = memberRepository.findByLoginId(request.getLoginId())
                 .orElseThrow(() -> new NotFoundException(ErrorCode.MEMBER_NOT_FOUND));
 
@@ -61,19 +64,19 @@ public class AttendanceService {
         this.attendanceRepository.save(attendance);
 
 
-        webSocketService.sendCurrentAttendanceUsers(member.getDept().getId(),getCurrentAttendanceUsers(member.getDept().getId()));
+        webSocketService.sendCurrentAttendanceUsers(member.getDept().getId(), getCurrentAttendanceUsers(member.getDept().getId()));
         long stopTime1 = System.currentTimeMillis();
-        System.out.println("attendance duration time :"+(stopTime1 - startTime1));
+        System.out.println("attendance duration time :" + (stopTime1 - startTime1));
 
 
         long startTime2 = System.currentTimeMillis();
-        this.webHookService.sendWebhookMessage(member.getName(),request.getStatus());
+        this.webHookService.sendWebhookMessage(member.getName(), request.getStatus());
         long stopTime2 = System.currentTimeMillis();
-        System.out.println("attendance duration of hook time :"+(stopTime2 - startTime2));
+        System.out.println("attendance duration of hook time :" + (stopTime2 - startTime2));
         return "출퇴근 저장 성공";
     }
 
-    public String requiredAttendanceCreate(UserAttendanceRequest request){
+    public String requiredAttendanceCreate(UserAttendanceRequest request) {
         Member member = memberRepository.findByLoginId(request.getLoginId())
                 .orElseThrow(() -> new NotFoundException(ErrorCode.MEMBER_NOT_FOUND));
 
@@ -91,7 +94,7 @@ public class AttendanceService {
     }
 
     @Autowired
-    public List attendanceGet(){
+    public List attendanceGet() {
         List<Attendance> resultList = attendanceRepository.findAllWithMember();
         List<AttendanceGetResponse> attendanceGetResponseList = new ArrayList<>();
         for (Attendance attendance : resultList) {
