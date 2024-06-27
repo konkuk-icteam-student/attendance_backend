@@ -1,0 +1,23 @@
+name: deploy-react
+on:
+  push:
+    branches: main
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Deploy spring MainServer(master)
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{ secrets.SERVER_HOST }}
+          username: ${{ secrets.SERVER_USERNAME }}
+          key: ${{ secrets.SSH_KEY }}
+          script: |
+            cd ~/info_team_attendance/attendance_backend
+            git fetch origin main
+            git merge origin/main
+            docker rm -f info_team_attendance_front_1 info_team_attendance_back_1
+            docker rmi info_team_attendance_back
+            cd ..
+            docker-compose up -d
