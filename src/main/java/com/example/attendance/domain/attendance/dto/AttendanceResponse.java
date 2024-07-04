@@ -16,6 +16,10 @@ public record AttendanceResponse(
 ) {
 
     public static AttendanceResponse from(Attendance entity) {
+        if (entity == null) {
+            return null;
+        }
+
         return AttendanceResponse.builder()
             .id(entity.getId())
             .attendanceTime(entity.getAttendanceTime())
