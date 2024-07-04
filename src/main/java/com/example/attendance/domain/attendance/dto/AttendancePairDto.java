@@ -7,8 +7,8 @@ import lombok.Getter;
 @Getter
 public class AttendancePairDto {
 
-    private AttendanceResponse arriveAttendance;
-    private AttendanceResponse leaveAttendance;
+    private final AttendanceResponse arriveAttendance;
+    private final AttendanceResponse leaveAttendance;
     private Duration workDuration;
 
     public AttendancePairDto(Attendance arriveAttendance, Attendance leaveAttendance) {

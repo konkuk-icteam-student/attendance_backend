@@ -3,6 +3,7 @@ package com.example.attendance.domain.attendance.service;
 import com.example.attendance.domain.attendance.dto.AttendanceGetResponse;
 import com.example.attendance.domain.attendance.dto.AttendanceMonthResponseDto;
 import com.example.attendance.domain.attendance.dto.AttendancePairDto;
+import com.example.attendance.domain.attendance.dto.AttendanceResponse;
 import com.example.attendance.domain.attendance.entity.Attendance;
 import com.example.attendance.domain.attendance.entity.AttendanceRepository;
 import com.example.attendance.domain.department.entity.Dept;
@@ -16,20 +17,24 @@ import com.example.attendance.domain.member.entity.MemberRepository;
 import com.example.attendance.exception.ErrorCode;
 import com.example.attendance.exception.NotFoundException;
 import jakarta.persistence.EntityNotFoundException;
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
-
 import java.time.Duration;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.stereotype.Service;
 
 @Slf4j
 @RequiredArgsConstructor
 @Service
 public class AttendanceService {
+
     private final MemberRepository memberRepository;
     private final AttendanceRepository attendanceRepository;
     private final WebSocketService webSocketService;
@@ -42,7 +47,7 @@ public class AttendanceService {
         long startTime1 = System.currentTimeMillis();
         log.info("학번 : {}", request.getLoginId());
         Member member = memberRepository.findByLoginId(request.getLoginId())
-                .orElseThrow(() -> new NotFoundException(ErrorCode.MEMBER_NOT_FOUND));
+            .orElseThrow(() -> new NotFoundException(ErrorCode.MEMBER_NOT_FOUND));
 
         if (member == null) {
             throw new EntityNotFoundException("해당 userId의 유저를 찾을 수 없습니다.");
@@ -63,11 +68,10 @@ public class AttendanceService {
 
         this.attendanceRepository.save(attendance);
 
-
-        webSocketService.sendCurrentAttendanceUsers(member.getDept().getId(), getCurrentAttendanceUsers(member.getDept().getId()));
+        webSocketService.sendCurrentAttendanceUsers(member.getDept().getId(),
+            getCurrentAttendanceUsers(member.getDept().getId()));
         long stopTime1 = System.currentTimeMillis();
         System.out.println("attendance duration time :" + (stopTime1 - startTime1));
-
 
         long startTime2 = System.currentTimeMillis();
         this.webHookService.sendWebhookMessage(member.getName(), request.getStatus());
@@ -78,7 +82,7 @@ public class AttendanceService {
 
     public String requiredAttendanceCreate(UserAttendanceRequest request) {
         Member member = memberRepository.findByLoginId(request.getLoginId())
-                .orElseThrow(() -> new NotFoundException(ErrorCode.MEMBER_NOT_FOUND));
+            .orElseThrow(() -> new NotFoundException(ErrorCode.MEMBER_NOT_FOUND));
 
         Attendance attendance = new Attendance();
         attendance.setMember(member);
@@ -93,7 +97,6 @@ public class AttendanceService {
         return "출퇴근 저장 성공";
     }
 
-    @Autowired
     public List attendanceGet() {
         List<Attendance> resultList = attendanceRepository.findAllWithMember();
         List<AttendanceGetResponse> attendanceGetResponseList = new ArrayList<>();
@@ -143,7 +146,7 @@ public class AttendanceService {
 
     public AttendanceMonthResponseDto getUserMonthlyAttendancePairs(String loginId, int year, int month) {
         Member member = memberRepository.findByLoginId(loginId)
-                .orElseThrow(() -> new NotFoundException(ErrorCode.MEMBER_NOT_FOUND));
+            .orElseThrow(() -> new NotFoundException(ErrorCode.MEMBER_NOT_FOUND));
 
         if (member == null) {
             throw new EntityNotFoundException("해당 사용자를 찾을 수 없습니다.");
@@ -152,7 +155,8 @@ public class AttendanceService {
         LocalDate startDate = LocalDate.of(year, month, 1);
         LocalDate endDate = startDate.plusMonths(1).minusDays(1);
 
-        List<Attendance> monthlyAttendance = attendanceRepository.findByMemberAndAttendanceDateBetween(member, startDate, endDate);
+        List<Attendance> monthlyAttendance = attendanceRepository.findByMemberAndAttendanceDateBetween(member,
+            startDate, endDate);
 
         // 1과 0을 시간순으로 정렬하여 묶어주는 메서드 호출(출근:1, 퇴근:0)
         return pairAttendances(monthlyAttendance);
@@ -184,7 +188,8 @@ public class AttendanceService {
                 Attendance arriveAttendance = (i < arriveList.size()) ? arriveList.get(i) : null;
                 Attendance leaveAttendance = (j < leaveList.size()) ? leaveList.get(j) : null;
 
-                if (leaveAttendance != null && (arriveAttendance == null || leaveAttendance.getAttendanceTime().isBefore(arriveAttendance.getAttendanceTime()))) {
+                if (leaveAttendance != null && (arriveAttendance == null || leaveAttendance.getAttendanceTime()
+                    .isBefore(arriveAttendance.getAttendanceTime()))) {
                     // 퇴근 데이터만 있는 경우 짝을 만듦
                     AttendancePairDto pair = new AttendancePairDto(null, leaveAttendance);
                     resultPairs.add(pair);
@@ -193,7 +198,8 @@ public class AttendanceService {
                         totalDuration = totalDuration.plus(pair.getWorkDuration());
                     }
                     j++;
-                } else if (arriveAttendance != null && (leaveAttendance == null || arriveAttendance.getAttendanceTime().isAfter(leaveAttendance.getAttendanceTime()))) {
+                } else if (arriveAttendance != null && (leaveAttendance == null || arriveAttendance.getAttendanceTime()
+                    .isAfter(leaveAttendance.getAttendanceTime()))) {
                     // 출근 데이터만 있는 경우 짝을 만듦
                     AttendancePairDto pair = new AttendancePairDto(arriveAttendance, null);
                     resultPairs.add(pair);
@@ -234,24 +240,24 @@ public class AttendanceService {
         }
 
         resultPairs.sort(Comparator
-                .comparing((AttendancePairDto pair) -> {
-                    Attendance arriveAttendance = pair.getArriveAttendance();
-                    if (arriveAttendance != null) {
-                        return arriveAttendance.getAttendanceDate();
-                    } else {
-                        // ArriveAttendance가 NULL인 경우 LeaveAttendance의 날짜를 반환
-                        return pair.getLeaveAttendance().getAttendanceDate();
-                    }
-                })
-                .thenComparing(pair -> {
-                    Attendance arriveAttendance = pair.getArriveAttendance();
-                    if (arriveAttendance != null) {
-                        return arriveAttendance.getAttendanceTime();
-                    } else {
-                        // ArriveAttendance가 NULL인 경우 LeaveAttendance의 시간을 반환
-                        return pair.getLeaveAttendance().getAttendanceTime();
-                    }
-                }));
+            .comparing((AttendancePairDto pair) -> {
+                AttendanceResponse arriveAttendance = pair.getArriveAttendance();
+                if (arriveAttendance != null) {
+                    return arriveAttendance.attendanceTime();
+                } else {
+                    // ArriveAttendance가 NULL인 경우 LeaveAttendance의 날짜를 반환
+                    return pair.getLeaveAttendance().attendanceTime();
+                }
+            })
+            .thenComparing(pair -> {
+                AttendanceResponse arriveAttendance = pair.getArriveAttendance();
+                if (arriveAttendance != null) {
+                    return arriveAttendance.attendanceTime();
+                } else {
+                    // ArriveAttendance가 NULL인 경우 LeaveAttendance의 시간을 반환
+                    return pair.getLeaveAttendance().attendanceTime();
+                }
+            }));
 
         AttendanceMonthResponseDto attendanceMonthData = new AttendanceMonthResponseDto();
         attendanceMonthData.setAttendanceDataList(resultPairs);
@@ -263,7 +269,7 @@ public class AttendanceService {
 
     public List<MemberInfoResponse> getCurrentAttendanceUsers(Long deptId) {
         Dept department = deptRepository.findById(deptId)
-                .orElseThrow(() -> new EntityNotFoundException("해당 부서를 찾을 수 없습니다."));
+            .orElseThrow(() -> new EntityNotFoundException("해당 부서를 찾을 수 없습니다."));
 
         // 부서에 속한 유저 중, 현재 출근중인 유저들을 조회
         List<Member> allUsersInDepartment = memberRepository.findByDept(department);
